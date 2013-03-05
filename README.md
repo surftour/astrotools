@@ -1,7 +1,10 @@
 astrotools
 ==========
 
-Collection of tools from my astrophysicist days related to generating, evolving, crashing, and visualizing numerical galaxies.
+This repository contains a mixed bag of numerical tools useful for the 
+generation, evolution, visualization, and analysis of theoretical
+galaxy models, i.e., the compete "toolkit" developed and during my days
+as an astrophysicist.
 
 Includes (or will include) the following:
 
@@ -11,5 +14,7 @@ makegalaxy = code to generate n-body realizations of compound galaxies.
 
 flexcombinegalaxies = tool to flexibly combine two galaxies/snapshots.
 
-idlstuff = useful analysis and visualization scripts 
+idlstuff = analysis and visualization scripts 
+
+snpa* = useful tools to look at simulated (or constructed) snapshot files
 
