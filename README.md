@@ -3,7 +3,7 @@ astrotools
 
 This repository contains a mixed bag of numerical tools useful for the 
 generation, evolution, visualization, and analysis of theoretical
-galaxy models, i.e., the compete "toolkit" developed and during my days
+galaxy models, i.e., the complete "toolkit" developed during my days
 as an astrophysicist.
 
 Includes (or will include) the following:
