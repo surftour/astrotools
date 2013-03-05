@@ -1,0 +1,39 @@
+EXEC   = MakePics
+
+SRCS   = main.c ngbtree2d.c  \
+	 nrutil.c selectb.c sort_flt.c sort2_flt.c 
+
+
+OBJS   = $(SRCS:.c=.o)
+INCL   = allvars.h   \
+	 nrutil.h
+
+.KEEP_STATE:
+
+CFLAGS =  -O3 # -fPIC
+
+LIBS   =  
+
+CC     =  gcc
+
+
+$(EXEC): $(OBJS) 
+	$(CC) $(OBJS) $(LIBS)  -o smoothedavg.so
+
+
+$(OBJS): $(INCL) 
+
+
+
+clean:
+	rm $(OBJS)  smoothedavg.so
+
+
+
+
+
+
+
+
+
+

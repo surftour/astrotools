@@ -1,0 +1,1 @@
+trapzd.o trapzd.o: nrsrc/trapzd.c

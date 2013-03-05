@@ -1,0 +1,9 @@
+get_total_number_of_groups
+get_group_catalogue
+get_group_indices
+get_minimum_group_len
+int get_total_particle_count
+int get_gas_particle_count
+int get_dm_particle_count
+int get_mass_particle_count
+int get_stars_particle_count

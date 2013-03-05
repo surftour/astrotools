@@ -1,0 +1,31 @@
+#! /bin/csh
+
+set LIST = `ls -1 *.eps`
+
+foreach file ($LIST)
+   set NEWFILENAME = `basename $file .ps`
+   set NEWFILENAME =  `basename $NEWFILENAME .eps`
+   echo Converting $file to $NEWFILENAME.gif ...
+   convert $file $NEWFILENAME.gif
+end
+
+set LIST = `ls -1 d*1.ps | grep -v small`
+
+foreach file ($LIST)
+   set NEWFILENAME = `basename $file .ps`
+   set NEWFILENAME =  `basename $NEWFILENAME .eps`
+   echo Converting $file to $NEWFILENAME.gif ...
+   convert -density 110 $file $NEWFILENAME.gif
+   convert -crop 720x690+100+300 $NEWFILENAME.gif $NEWFILENAME.gif   
+end
+
+set LIST = `ls -1 d*2.ps | grep -v small`
+
+foreach file ($LIST)
+   set NEWFILENAME = `basename $file .ps`
+   set NEWFILENAME =  `basename $NEWFILENAME .eps`
+   echo Converting $file to $NEWFILENAME.gif ...
+   convert -density 110 $file $NEWFILENAME.gif
+   convert -crop 580x800+170+250 $NEWFILENAME.gif $NEWFILENAME.gif   
+end
+

@@ -1,0 +1,124 @@
+
+%
+% ------- basics -------
+
+
+%
+% file
+%
+OutputDir		./                          % Output directory
+OutputFile		h90sphere.hdf5                  % Initial conditions file
+
+%
+% halo details etc.
+%
+CC			12.0                        % halo concentration
+V200			160.0                       % circular velocity in km/sec
+LAMBDA			0.0                         % spin parameter
+AnisotropyRadius        0.0                         % anisotropy radiu, in terms of
+                                                    % hernquist profile radius RH
+
+
+%
+% any baryons?
+%
+MD			0.0                         % disk mass fraction
+MB			0.0                         % bulge mass fraction
+MBH			0.0                          % black hole mass fraction. If non-zero,
+                                                    % then a particle is generated at x=0,
+
+%
+% number of particles
+%
+N_HALO			100000                     % number of dark halo particles
+N_DISK		        0                          % number of disk particles
+N_GAS		        0                          % number of gas particles
+N_BULGE			0                          % number of bulge particles
+
+
+
+UseQrng                 0                           % 0=pseudorandom, 1=quasirandom numbers
+WriteDensity            0                           % write density instead of mass
+
+
+
+
+
+%
+% ------- details -------
+
+%
+% disk (gas + stars)
+%
+JD			0.04                        % disk spin fraction, typically equal to MD
+H                       0                           % disk scale length (typically set by JD)
+DiskHeight		0.1                         % stellar disk scale hieight, in units of H
+RadialDispersionFactor	1.0                         % radial dispersion in units of the vertical
+                                                    % dispersion
+DiskPopMode             exponential                 % either "constant", "instantaneous", or "exponential"
+DiskPopAge              13.9                        % in Gyr
+DiskPopTau              -106.0                      % in Gyr (generally negative)
+
+%
+% disk gas specific things
+%
+GasFraction		0.0                         % fraction of MD that is gas
+MaxGasDiskHeight	1.0                         % prevent flaring of outer gas disk
+GasDistribution         0                           % 0 = exponential disk (same for gas/stars)
+                                                    % 1 = exponential disk (with Rd_gas -> Rd*Alpha)
+                                                    % 2 = power law (PowerLawGamm < 2)
+GasExpAlpha             1.0                         % gas disk scale length multiplicative factor
+PowerLawGamma           1.0                         % power law index, sigma = r^-gamma
+                                                    %  gamma < 2, gamma = 1 is mestel
+PowerLawCutoff          1.0                         % max radius of gas for power law distribution,
+                                                    %  in units of H
+Zmet0                   0.032                       % gas metallicity central value (solar)
+ZmetGrad               -0.03                        % gas metallicity gradient (dex/kpc)
+
+
+%
+% parameters to calculate force when determining
+% thickness of gas disk
+%
+GravSoftening           0.025                       % soften force on small scales
+ErrTolTheta             0.15                        % tree opening criteria
+
+%
+% SH03 ism model - net pressure sets vertical scale of gas
+%
+MaxSfrTimescale		4.5                         % gas consumption timescale
+FactorSN		0.1                         % beta, mass fraction of massive stars
+FactorEVP		3000                        % A_0, evaporation parameter
+TempSupernova		3.0e8                       % T_SN, effective supernova temperature
+TempClouds		1000                        % temperature of cold clouds
+FactorForSofterEQS	1                           % softens equation of state, 1.0 is full
+                                                    % SH03 multiphase model, and 0.0 is isothermal
+                                                    % at 10^4 K
+
+%
+% bulge
+%
+BulgeSize		0.2                         % bulge scale length in units of H
+BulgePopMode            instantaneous               % either "constant", "instantaneous", or "exponential"
+BulgePopAge             13.9                        %
+BulgePopTau             1.0                         %
+
+
+
+
+%
+% ------- cosmology -------
+
+
+%
+% scale V-M-R with redshift
+% (according to Bullock)
+%
+REDSHIFT                0.0
+Omega_m0                0.3
+Omega_L0                0.7
+
+
+
+
+

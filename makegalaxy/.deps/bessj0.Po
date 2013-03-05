@@ -1,0 +1,8 @@
+bessj0.o bessj0.o: nrsrc/bessj0.c /usr/include/math.h \
+  /usr/include/architecture/i386/math.h /usr/include/sys/cdefs.h
+
+/usr/include/math.h:
+
+/usr/include/architecture/i386/math.h:
+
+/usr/include/sys/cdefs.h:

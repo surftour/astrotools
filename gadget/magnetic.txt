@@ -1,0 +1,106 @@
+
+
+MAGNETIC 
+        - Switches on following of a magnetic field vector B[] for
+          each SPH particle. This only follows the induction equation
+          (in the form of equation 8.10 in Monaghan's 1992 review)
+
+MAGFORCE
+        - When this is set, the code includes magnetic forces in the
+          equations of motion of gas particles. Otherwise the magnetic
+          field is only followed passively, i.e. it would not play a
+          dynamical role.
+
+CORRECTBFRC
+        - Modifies the magnetic pressure forces in analogy with the
+          hydrodynamic forces. This appears to improve the results
+          quite a bit, judging from magnetic shock tubes. Can be
+          recommended. 
+
+DIVBFORCE
+        - If this is set, the "divB-component" of the magnetic force
+          is substracted, i.e. effectively the Lorentz force is used
+          and not the one based on the magentic stress tensor (which
+          involves the assumption divB=0). If the magnetic forces
+          become very large, this formulation might behave somewhat
+          better, particularly when large divB!=0 errors develop.
+
+DBOUTPUT
+        - This option includes the rate of change of the magnetic
+          field (dB/dt) in the output file.
+
+TRACEDIVB
+        - This makes each particle estimate the local divB (purely
+          passive option), in order to monitor a potentially growing
+          divB component. The divB values are also stored in a
+          separate field in the snapshots produced by gadget. If
+          XXLINFO is set, one gets some information in each timestep
+          about the maximum divB.
+
+XXLINFO 
+        - Generates additional Log-File information in the file
+          xxl.txt
+          There, one gets a mean B-field strength, and the maximum
+          div(B) value for each timestep.
+
+BINISET
+        - If this option is set, one can specify with the parameters
+          BiniX, BiniY, and BiniZ an initial homogenous magnetic
+          field.
+          Otherwise, the initial B-field (for restart from initial
+          conditions) must be set as a vector field in a block that
+          comes directly after the gas temperatures. 
+
+BSMOOTH 
+        - If this is set, the code computes for each particle a
+          locally smoothed magnetic field Bsmooth[] (kernel-averaged
+          over the local smoothing region). Depending on the setting
+          of the parameters BSmoothInt and BsmoothFrac, the actual
+          magnetic field evolved by the code can be "cleaned"
+          from time to time, i.e. replaced with a smoother
+          version. This can be viewed as a rough method to account for
+          magnetic reconnection when the field becomes too
+          tangled. Such a cleaning step is only done when a "full"
+          timestep is carried out, i.e. when all particles are
+          synchronized. The integer parameter BSmoothInt regulates on
+          which of these full steps a cleaning is done. A value of 1
+          does it every full step, a value of 4, for example, only
+          every fourth, while 0 never does it. The cleaning itself
+          means replacing the current magnetic field with a weighted
+          average of the current value and the smoothed version of it.
+          If the weight (BSmoothFrac) is equal to 0.5, you have an
+          arithemtic average, for 1.0 one has a replacement with the
+          smoothed version, while 0.0 will not change anythings.
+
+OUTPUTBSMOOTH
+        - Can be set to write the smoothed magnetic field into the
+          snapshot fields. Works only together with BSMOOTH.
+
+
+
+
+CORRECTDB
+        - Muliply dB/dt with 1/(1+) factor. Experimental, and
+          not recommended at this point.
+
+ARTBPRES
+        - Generates an artifical magnetic pressure. Experimental,
+          don't set. 
+
+BRIOWU
+        - Only used for testing purposes. If not set, the code assumes
+          that the magnetic field is given in cgs-units ("Gauss"),
+          both internally and in all output/input files.
+
+
+
+
+Parameters in parameterfile:
+
+  BiniX    (only if compiled with BINISET)
+  BiniY
+  BiniZ
+
+  BSmoothInt   (only if compiled with BSMOOTH)
+  BSmoothFrac
+

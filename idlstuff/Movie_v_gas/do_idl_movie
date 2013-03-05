@@ -1,0 +1,25 @@
+#!/bin/sh
+#BSUB -q nancy
+#BSUB -J mov_g_xy
+#BSUB -n 1
+#BSUB -u tcox@cfa.harvard.edu
+#BSUB -o mov_g_xy.out
+#BSUB -e mov_g_xy.err
+#BSUB -R "span[ptile=1]"
+#BSUB -N
+
+
+
+idl <<EOF
+
+;.run MoviePicsFaceOn
+;.run MoviePicsFaceOn_v2
+.run MoviePicsFaceOn_v3
+
+EOF
+
+echo "done"
+
+
+
+

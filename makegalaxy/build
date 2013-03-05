@@ -1,0 +1,16 @@
+
+autoreconf -fiv
+export CFLAGS='-g -O2 -I/usr/local/hdf5/include -DH5_USE_16_API'
+export LDFLAGS=-L/usr/local/hdf5/lib
+./configure
+make
+
+
+#
+# to clean up everything
+# make clean
+# make distclean
+# rm -rf a.out.dSYM/ autom4te.cache/ Makefile Makefile.in aclocal.m4 config.log config.log config.status configure depcomp install-sh missing mkinstalldirs
+#
+
+

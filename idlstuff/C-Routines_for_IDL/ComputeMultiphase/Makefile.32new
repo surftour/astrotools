@@ -1,0 +1,32 @@
+
+
+
+EXEC   = mphase
+
+
+OBJS   = main.o \
+	 cooling.o 
+
+INCL   = allvars.h cooling.h proto.h prototypes.h
+
+
+CFLAGS =  -fPIC -m32 -O0 -g  -DCOOLING #  -Wall
+
+LIBS   =  -lm
+
+CC     =  cc
+
+$(EXEC): $(OBJS)
+	$(CC) -L/usr/lib -L/usr/local/lib  -shared $(CFLAGS) $(OBJS) $(LIBS)  -o $(EXEC)
+
+
+
+
+
+$(OBJS): $(INCL) 
+
+
+.PHONY : clean
+clean:
+	rm -f $(OBJS) $(EXEC)
+

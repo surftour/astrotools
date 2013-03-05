@@ -1,0 +1,46 @@
+EXEC   = isophotfit.so
+
+OBJS   = main.o  nrsrc/nrutil.o  nrsrc/zriddr.o
+
+
+INCL   =  proto.h nrsrc/nrutil.h
+
+CFLAGS =  -O3 -fPIC -Wall
+
+
+LNKCMD =  ld -shared
+
+
+#SYSTYPE="Regatta"
+ifeq ($(SYSTYPE),"Regatta")
+CFLAGS =  -O2   $(OPTIONS)
+LNKCMD =   cc   -bM:SRE -bnoentry -bE:export.txt
+endif
+
+
+LIBS   =  -lm
+
+CC     =  cc
+
+
+$(EXEC): $(OBJS) 
+	 $(LNKCMD)  $(OBJS) $(LIBS)  -o $(EXEC)
+
+
+$(OBJS): $(INCL) 
+
+clean:
+	rm -f $(OBJS) $(EXEC)
+
+
+ 
+
+
+
+
+
+
+
+
+
+

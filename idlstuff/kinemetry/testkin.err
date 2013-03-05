@@ -1,0 +1,19 @@
+IDL Version 7.0 (linux x86_64 m64). (c) 2007, ITT Visual Information Solutions
+Installation number: 219149-1.
+Licensed for use by: Licensed for Finkbeiner group
+
+% Compiled module: KINEMETRY_EXAMPLE.
+% Compiled module: READFITS.
+% Compiled module: SXPAR.
+% Compiled module: GETTOK.
+% Compiled module: VALID_NUM.
+% READFITS: Now reading 480 by 480 array
+% Compiled module: TJ_KINEMETRY.
+% Compiled module: MPFIT.
+% Subscript range values of the form low:high must be >= 0, < size, with low
+  <= high: RAD.
+% Execution halted at: TJ_KINEMETRY      787
+  /n/home/tcox/Tools/idlstuff/kinemetry/tj_kinemetry.pro
+%                      KINEMETRY_EXAMPLE   47
+  /n/home/tcox/Tools/idlstuff/kinemetry/tj_test.pro
+%                      $MAIN$          

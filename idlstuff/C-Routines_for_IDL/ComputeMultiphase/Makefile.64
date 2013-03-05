@@ -1,0 +1,27 @@
+
+EXEC   = mphase
+
+
+OBJS   = main.o \
+	 cooling.o 
+
+INCL   = allvars.h cooling.h proto.h prototypes.h
+
+CFLAGS =  -fPIC -m64 -O3 -g -DCOOLING  #  -Wall
+LNKCMD =  ld -m elf_x86_64  -L/usr/lib64 -L/usr/local/lib64  -shared
+
+LIBS   =  -lm 
+
+CC     =  cc 
+
+$(EXEC): $(OBJS) 
+	$(LNKCMD) $(OBJS) $(LIBS)  -o $(EXEC)
+
+
+$(OBJS): $(INCL) 
+
+
+.PHONY : clean
+clean:
+	rm -f $(OBJS) $(EXEC)
+

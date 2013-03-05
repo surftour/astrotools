@@ -1,0 +1,123 @@
+From phopkins@cfa.harvard.edu Wed Jul 19 19:48:56 2006
+Date: Tue, 30 May 2006 14:17:15 -0400
+From: Philip Hopkins <phopkins@cfa.harvard.edu>
+To: Brant Robertson <brobertson@cfa.harvard.edu>,
+     Thomas J. Cox <tcox@cfa.harvard.edu>, Yuexing Li <yxli@cfa.harvard.edu>,
+     Sukanya Chakrabarti <schakrab@cfa.harvard.edu>
+Subject: agn spectrum, attenuation, etc
+
+Hi all,
+
+
+	So, for the paper compiling the quasar luminosity function  
+measurements that just came out, I had to go back into the guts of  
+how we were modeling the agn spectrum, etc. Anyways, as a by-product,  
+I've written some expanded versions of the attenuation code, agn  
+spectrum code, and another code to dump the QLF (either bolometric or  
+in arbitrary bands) from the combined observations etc. in this  
+recent paper. So I though you all might be interested in the codes.
+
+	For each of the three codes (attenuation, agn_spectrum,  
+qlf_calculator), there's a c-code (which should be entirely self- 
+contained), with it's own makefile, and an IDL script that's set up  
+to call the code (each such IDL script has one line at the very  
+beginning of the script pointing it to where the executable is, so  
+just change that to wherever you compile it).
+
+	I tried to comment the overhead on each pretty thoroughly (in  
+the .pro files for attenuation and agn_spectrum, and in the .c file  
+mainly for the qlf file), but feel free to ask me about it. Major  
+bullet points:
+
+attenuation:
+	I borrowed liberally from Brant's version of the code to do the  
+proper splitting of the Morrison & McCammon photoionization cross- 
+sections into metal-free and metals components which (obviously)  
+scale with metallicity differently. This version of the code adds a  
+simple flag to use either SMC-like, LMC-like, or MW-like dust curves  
+for the attenuation. It also adds a more detailed treatment of  
+Compton-thick cross-sections (it uses the transmission curves asa  
+function of NH from Matt, Pompilio, & La Franca 1995, decomposed into  
+metal-free & metals components). also has a flag to return the  
+integrated attenuation over the soft or hard X-ray bands instead of  
+at a specific frequency.
+
+agn_spectrum:
+	this one is re-written from scratch b/c in the QLF paper we adopt a  
+number of improvements over Marconi et al. 2004. the code will let  
+you call either the Marconi-esque spectrum, the template spectrum we  
+build in the QLF paper, or the mean Richards et al. 2006 spectrum.  
+The primary difference between the marconi-like spectrum and the more  
+recent one is the lack (in the marconi spectrum) of a hot dust bump  
+-- as noted in the comments and as brant pointed out last week,  
+whether you want to include this really depends on your application.  
+if you want a typical bolometric correction, you should include the  
+bump (i.e. use the QLF paper spectrum). if you are trying to model  
+that IR re-emission and believe the simulations can capture it, of  
+course use the input spectrum without it. the QLF paper spectrum also  
+includes a more detailed treatment of the continuum shape. I would  
+only recommend using the Richards et al. spectrum if you want to  
+compare with the results of assuming a constant (luminosity- 
+independent) bolometric correction, as the proper corrections do  
+depend on luminosity (but if you do make this comparison, the  
+richards et al. template has fewer biases than the elvis et al. 1994  
+template). you can use the keyword SDSS to overlay the vanden Berk et  
+al. template optical spectrum over any continuum (it uses a  
+reasonably robust sliding continuum division and addition to overlay  
+it). you can also just return the integrated luminosity in various  
+bands. finally, i say marconi-esque b/c I've actually substantially  
+modified the marconi et al. template. a couple small changes to the  
+input spectral slopes and X-ray input parameters based on more recent  
+determinations, and a different scaling of optical-to-xray adopted  
+from more recent (and statistically more appropriate) measurements.  
+the effects are usually subtle, but are very important for the  
+bolometric corrections of the highest-luminosity X-ray sources.
+
+qlf_calculator:
+	the comments here are in the c-code. basically, give it luminosities  
+& redshift & it gives you the QLF, bolometric or in any band you  
+specify. you can use the different fits from the QLF paper, although  
+it will default to the full best-fit model.
+
+pretty much all the inputs to the idl scripts can be arbitrary  
+vectors or scalars (it won't dump out b/c you do or don't give it a  
+large grid, for example).
+
+cheers,
+- phil
+
+
+
+    [ Part 2, Application/OCTET-STREAM (Name: "agn_spectrum.tgz")  18KB. ]
+    [ Unable to print this part. ]
+
+
+    [ Part 3, Application/OCTET-STREAM (Name: "attenuate.tgz")  12KB. ]
+    [ Unable to print this part. ]
+
+
+    [ Part 4, Application/OCTET-STREAM (Name: "qlf_calculator.tgz")  ]
+    [ 21KB. ]
+    [ Unable to print this part. ]
+
+
+    [ Part 5: "Attached Text" ]
+
+
+
+PS - If anyone has issues with contour_lum or its cousins (the NH  
+code, etc), let me know, I've got the version vetted against all the  
+stuff elizabeth has thrown at it.
+
+
+
+
+
+Philip Hopkins
+Harvard-Smithsonian CfA
+Harvard University
+60 Garden Street, MS-10
+Cambridge, MA 02138
+email: phopkins@cfa.harvard.edu
+
+

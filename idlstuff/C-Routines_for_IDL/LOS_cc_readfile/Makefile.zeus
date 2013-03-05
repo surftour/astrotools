@@ -1,0 +1,53 @@
+#
+#  Makefile for code to analyze output of P-Gadget-2 simulations 
+#
+
+OBJS = 	readsnap.o allocate.o printhead.o system.o setup_units.o \
+		localvalues.o cooling.o tree.o no_tree.o ngbtree3d.o selectb.o
+CC = /usr/bin/gcc
+F77 = f77 
+INCL = overhead.h proto.h ngbtree3d.h
+LIB = -lm
+
+#INC = 
+
+sim :  ${OBJS} ${INC} main.c
+	${CC} -c main.c 
+	${F77} -o $@ main.o ${OBJS} ${LIB} 
+
+readsnap.o : readsnap.c
+	${CC} -c readsnap.c 
+
+allocate.o : allocate.c
+	${CC} -c allocate.c 
+
+selectb.o : selectb.c
+	${CC} -c selectb.c 
+
+ngbtree3d.o : ngbtree3d.c
+	${CC} -c ngbtree3d.c 
+
+printhead.o : printhead.c
+	${CC} -c printhead.c 
+
+system.o : system.c
+	${CC} -c system.c 
+
+setup_units.o : setup_units.c
+	${CC} -c setup_units.c 
+
+cooling.o : cooling.c
+	${CC} -c cooling.c 
+
+tree.o : tree.c
+	${CC} -c tree.c 
+
+no_tree.o : no_tree.c
+	${CC} -c no_tree.c 
+
+localvalues.o : localvalues.c
+	${CC} -c localvalues.c 
+
+clean: 
+	/bin/rm -f core *.o sim
+

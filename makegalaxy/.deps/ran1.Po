@@ -1,0 +1,1 @@
+ran1.o ran1.o: nrsrc/ran1.c

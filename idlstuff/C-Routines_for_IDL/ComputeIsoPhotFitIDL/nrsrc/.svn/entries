@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="444"
+   name=""
+   committed-date="2003-07-06T12:41:55.000000Z"
+   url="http://www.mpa-garching.mpg.de/svn/cosmo-group/tools/Idl/C-Routines_for_IDL/ComputeIsoPhotFitIDL/nrsrc"
+   last-author="volker"
+   kind="dir"
+   uuid="019ef673-9300-0410-806d-f16013bd1951"
+   revision="2005"/>
+<entry
+   committed-rev="444"
+   name="zriddr.c"
+   text-time="2005-10-24T21:05:12.000000Z"
+   committed-date="2003-07-06T12:41:55.000000Z"
+   checksum="122b0fdd5f7d10ae5c5c5ee1c60da31c"
+   last-author="volker"
+   kind="file"
+   prop-time="2005-10-24T21:05:12.000000Z"/>
+<entry
+   committed-rev="377"
+   name="nrutil.h"
+   text-time="2005-10-24T21:05:12.000000Z"
+   committed-date="2003-06-24T07:31:47.000000Z"
+   checksum="3a82f47483f94ee03eb75d4aa02fdb6b"
+   last-author="volker"
+   kind="file"
+   prop-time="2005-10-24T21:05:12.000000Z"/>
+<entry
+   committed-rev="377"
+   name="nrutil.c"
+   text-time="2005-10-24T21:05:12.000000Z"
+   committed-date="2003-06-24T07:31:47.000000Z"
+   checksum="c6278987184630efa281c5f9cfa98d60"
+   last-author="volker"
+   kind="file"
+   prop-time="2005-10-24T21:05:12.000000Z"/>
+</wc-entries>

@@ -1,0 +1,576 @@
+
+
+
+pro testit, junk
+
+do_one_angle, "data/ds/vc3vc3i", 0.0, 0.0, snapnum=19, filename="test.eps", xlen=7.0, $
+					R_e= R_e, $
+                                        Vrot_maj=Vrot_maj, avgVrot_maj=avgVrot_maj, $
+                                        Vrot_min=Vrot_min, avgVrot_min=avgVrot_min, $
+                                        pa=pa, Sig=sig, $
+                                        fit_a=fit_a, fit_b=fit_b, $
+                                        fit_ellip=fit_ellip, a4diva=a4diva
+
+
+print, "R_e= ", R_e
+print, "Vrot_maj= ", Vrot_maj
+print, "avgVrot_maj= ", avgVrot_maj
+print, "Vrot_min= ", Vrot_min
+print, "avgVrot_min= ", avgVrot_min
+print, "pa= ", pa
+print, "Sig= ", Sig
+print, "fit_a= ", fit_a
+print, "fit_b= ", fit_b
+print, "a4diva= ", fit_ellip
+print, "a4diva= ", a4diva
+
+
+end
+
+
+
+; -----------------------------------------------------------------------------
+
+
+
+pro process_kinematics, frun, snapnum
+
+
+
+if not keyword_set(frun) then begin
+        print, "  "
+        print, " process_kinematics, frun, snapnum"
+        print, "  "
+        return
+endif
+
+if not keyword_set(snapnum) then begin
+
+        ;print, "  "
+        ;print, " process_kinematics, frun, snapnum"
+        ;print, "  "
+        ;return
+
+	bhmtime= fload_bh_mergertime(frun)
+        if bhmtime le 0 then begin
+                ;print, " "
+                ;print, " WARNING: can't determine bhmtime, setting to be 2.0"
+                ;print, " "
+                ;bhmtime= 2.0
+
+		; use centers.txt file
+		bhmtime= fload_mergertime(frun)
+        endif
+
+        spawn, "/bin/ls "+frun+"/snapshot* | wc ",result
+        totnumsnap=long(result[0])-1
+
+	relaxationtime= 0.7  ; Gyr/h
+
+	bhmtime_snaptime= -1
+	bhmtime_snapnum= -1
+
+        for i=0,totnumsnap do begin
+            ok= fload_snapshot_bh(frun,i,/header_only)
+
+	    bhnum= fload_npart(5)
+	    if i eq 0 then bhnum_lastsnap= bhnum
+
+	    if bhnum ne bhnum_lastsnap then begin
+		bhmtime_snaptime= fload_time(1)
+		bhmtime_snapnum= i
+	    endif
+
+            ; grab snapnum when system is "relaxed"
+            if (fload_time(1) gt (bhmtime+relaxationtime)) or (i eq totnumsnap) then begin
+		snapnum= i
+		break
+	    endif
+
+	    bhnum_lastsnap= bhnum
+
+	endfor
+
+	print, " "
+	print, "         Timing Information "
+	print, " ----------------------------------- "
+	print, " fload_bh_mergertime= ", bhmtime
+	print, " bhmtime_snaptime= ", bhmtime_snaptime
+	print, " bhmtime_snapnum= ", bhmtime_snapnum
+	print, " analyze at "+string(bhmtime_snaptime)+" + "+string(relaxationtime)+" Gyr/h later"
+	print, " snapnum= ", snapnum
+	print, " "
+
+
+	if bhnum eq 2 then begin
+		print, " "
+		print, " PROBLEM: BH's never merged"
+		print, " "
+		;return
+	endif
+
+endif
+
+
+ok=fload_snapshot_bh(frun, snapnum, /nopot_in_snap)
+
+bhid= fload_blackhole_id(1)
+;bhid= bhid[0]
+;bhid= bhid[1]
+;bhid= 200001L
+;bhid= 280002L   ; used for z3/b4e
+;bhid= 400002L   ; used for ds/vc3vc3e_2
+bhid= long(max(bhid))   ; uses minimum bhid - then you don't need to know the BH ID
+center_bh= fload_blackhole_xyz('xyz',center=[0,0,0],idtofollow=bhid)
+
+print, "Blackhole ID: ", bhid
+print, "Blackhole center: ", center_bh
+
+
+
+; setup directory information
+fitsdir= frun+'/snap_'+fload_finfo_exts(1)+'_info/'
+
+; first, save copy of previous kinematics file
+;spawn, "mv -i "+frun+"/kinematics.txt.old "+frun+"/kinematics.txt.1"
+;spawn, "mv -i "+frun+'/snap_'+fload_finfo_exts(1)+'_info_old/ '+frun+'/snap_'+fload_finfo_exts(1)+'_info_1/'
+;spawn, "mv -i "+frun+"/kinematics.txt "+frun+"/kinematics.txt.2"
+;spawn, "mv -i "+fitsdir+" "+frun+'/snap_'+fload_finfo_exts(1)+'_info_2/'
+
+; now, make directory
+print, "making directory ", fitsdir
+spawn, "mkdir "+fitsdir
+
+
+
+; find R_e & set xlen for all images
+reff= fload_allstars_3dhalfmassr(1)
+xlen_orig= long(reff * 2.25 + 0.5)
+
+
+
+; --------------------------------------------------------
+
+;  read the list of theta's and phi's
+
+anglefile= '/n/home/tcox/unitsphereangles.txt'
+
+spawn, "wc "+anglefile,result
+lines=long(result)
+Nangles=lines(0)-5
+if Nangles GT 0 then angle_data= fltarr(2,Nangles)
+
+openr, 1, anglefile
+
+junk=''
+readf, 1, junk
+readf, 1, junk
+readf, 1, junk
+readf, 1, junk
+readf, 1, junk
+readf, 1, angle_data
+close, 1
+
+
+theta= angle_data[0,*]
+phi= angle_data[1,*]
+
+
+; --------------------------------------------------------
+
+
+
+; --------------------------------------------------------
+;
+;   Loop through the angles, project and calculate
+;  the rotation, dispersion, size, ellipticity, and disky/boxy - ness
+;
+
+Re_i= fltarr(Nangles)
+vrot_i_maj= fltarr(Nangles)
+vrotavg_i_maj= fltarr(Nangles)
+vrot_i_min= fltarr(Nangles)
+vrotavg_i_min= fltarr(Nangles)
+sig_i= fltarr(Nangles)
+PA_i= fltarr(Nangles)
+fit_a_i= fltarr(Nangles)
+fit_b_i= fltarr(Nangles)
+ellip_i= fltarr(Nangles)
+a4diva_i= fltarr(Nangles)
+
+
+
+for i= 0, Nangles-1 do begin
+
+        print, " ------------------------------------------------------------------ "
+	print, "    processing: "+string(i)
+	print, "    theta= "+string(theta[i])
+	print, "    phi= "+string(phi[i])
+        print, " ------------------------------------------------------------------ "
+
+        rotate_phi= phi[i]
+        rotate_theta= theta[i]
+
+
+	istring= strcompress(string(i), /remove_all)
+        thisfilename= fitsdir+'/kinmap_'+istring+'.eps'    ; kind of funky becuase
+                                                        ; contour_makepic assumes
+                                                        ; the ending is eps
+
+
+	xlen= float(xlen_orig)
+	pa= 0.0     ; need this so it resets the position angle for each slit
+
+	do_one_angle, frun, rotate_theta, rotate_phi, snapnum=snapnum, filename=thisfilename, /loadedsnap, $
+					R_e= R_e, $
+					xlen= xlen, $
+					Vrot_maj=Vrot_maj, avgVrot_maj=avgVrot_maj, $
+					Vrot_min=Vrot_min, avgVrot_min=avgVrot_min, $
+					pa=pa, Sig=sig, $
+					fit_a=fit_a, fit_b=fit_b, $
+					fit_ellip=fit_ellip, a4diva=a4diva
+
+
+	Re_i[i]= R_e
+	vrot_i_maj[i]= Vrot_maj
+	vrotavg_i_maj[i]= avgVrot_maj
+	vrot_i_min[i]= Vrot_min
+	vrotavg_i_min[i]= avgVrot_min
+	PA_i[i]= pa
+	Sig_i[i]= Sig
+	fit_a_i[i]= fit_a
+	fit_b_i[i]= fit_b
+	ellip_i[i]= fit_ellip
+	a4diva_i[i]= a4diva
+
+
+endfor
+
+
+; ------------------------------------------------------------------
+
+openw, 1, frun+'/kinematics.txt', ERROR=err
+        
+printf, 1, "#   kinematics.txt, "+frun+" snap= "+string(snapnum)
+printf, 1, "#   "
+printf, 1, "#                                                                                          -- Major Axis --    -- Minor Axis --  "
+printf, 1, "#  theta      phi     R_e         a         b                                   Sig_0     V_rot    <V_rot>    V_rot    <V_rot>  "
+printf, 1, "#  (deg)    (deg)  (kpc/h)   (kpc/h)   (kpc/h)     ellip       pa      a4/a    (km/s)    (km/s)     (km/s)   (km/s)     (km/s)  "
+
+for i=0,Nangles-1 do begin 
+        printf, 1, FORMAT= '(2(F8.3," "),4(F8.4,"  "),1(F8.2,"  "),1(F8.4,"  "),5(F8.2,"  "))', $
+                theta[i], phi[i], $
+		Re_i[i], $
+		fit_a_i[i], fit_b_i[i], ellip_i[i], PA_i[i], a4diva_i[i], $
+		sig_i[i], $
+		vrot_i_maj[i], vrotavg_i_maj[i], vrot_i_min[i], vrotavg_i_min[i]
+endfor 
+close, 1
+
+
+
+
+; ------------------------------------------------------------------
+
+
+
+end
+
+
+
+
+;##############################################################################################
+;##############################################################################################
+;##############################################################################################
+
+
+
+
+
+;=============================================================
+;
+; grid: 3x1
+;
+; 1) slit info
+; 2) project gas or star density
+; 3) velocity field
+;
+;=============================================================
+
+
+pro do_one_angle, frun, rt, rp, pa=pa, snapnum=snapnum, loadedsnap=loadedsnap, $
+					filename=filename, $
+					xlen=xlen, $
+					R_e= R_e, $
+					Vrot_maj=Vrot_maj, avgVrot_maj=avgVrot_maj, $
+					Vrot_min=Vrot_min, avgVrot_min=avgVrot_min, $
+					Sig=sig, $
+					fit_a=fit_a, fit_b=fit_b, $
+					fit_ellip=fit_ellip, a4diva=a4diva
+
+
+if not keyword_set(frun) then begin
+        print, " "
+        print, " do_one_angle, frun, rotate_theta, rotate_phi,"
+        print, "                          pa=pa, snapnum=snapnum,"
+        print, "                          filename=filename"
+        print, " "
+        return
+endif
+
+
+if not keyword_set(snapnum) then begin
+        print, " "
+        print, " do_one_angle, frun, rotate_theta, rotate_phi,"
+        print, "                          pa=pa, snapnum=snapnum,"
+        print, "                          filename=filename"
+        print, " "
+        return
+endif
+
+
+
+; --------------------------
+;  Setup stuff
+; --------------------------
+
+if not keyword_set(filename) then filename='slit_ho.eps'
+
+if not keyword_set(xlen) then xlen= 10.0
+
+; view 0
+if keyword_set(rt) then rotate_theta= rt else rotate_theta= 0.0
+if keyword_set(rp) then rotate_phi= rp else rotate_phi= 0.0
+
+if keyword_set(pa) then pa_fixed= pa else pa_fixed= -1
+
+
+
+
+; slit dimensions
+; -----------------
+slit_bins = 50
+; default
+;slit_width = xlen*0.06
+;slit_len = xlen*0.9
+; trial 
+slit_width = xlen*0.06
+slit_len = xlen*0.9
+
+; plot range
+slitmax = xlen*1.1
+
+vmax= 250.0
+vscale= 200.0
+
+; image size
+;xlen= 1.2*slit_len
+;xlen= 8.0
+
+
+fitstoo= 1
+;fitstoo= 0
+
+
+; start it up
+; -------------
+
+
+x0= 0.08
+xs= (0.90-x0)/3.0   ; assumes 3 panels
+
+x1= x0+xs
+x2= x0+xs+xs
+x3= x0+xs+xs+xs
+x4= x0+xs+xs+xs+xs
+    
+y0= 0.02
+y1= 0.98
+
+
+
+; ---------------
+;  Do it Up
+; ---------------
+
+if not keyword_set(loadedsnap) then ok=fload_snapshot_bh(frun,snapnum)
+
+
+; get print stuff ready
+; ----------------------
+initialize_plotinfo, 1
+        
+;setup_plot_stuff, 'ps', filename=filename, colortable= 4, newxsize=21, newysize=10
+;setup_plot_stuff, 'ps', filename=filename, colortable= 1, newxsize=21, newysize=10
+setup_plot_stuff, 'ps', filename=filename, colortable= 0, newxsize=32, newysize=10
+print, "writing: ", filename
+
+
+; what center do we use?
+; ------------------------
+
+; option 1  (use what's computed at end of snapshot loader)
+center= fload_center_alreadycomp(1)
+print, "center (alreadycomp)= ", center
+
+; option 2  (use BH position)
+bhid= fload_blackhole_id(1)
+stop
+if bhid[0] gt 0 then begin 
+	bhid= long(max(bhid))   ; uses minimum bhid - then you don't need to know the BH ID
+	center= fload_blackhole_xyz('xyz',center=[0,0,0],idtofollow=bhid)
+	print, "Blackhole ID: ", bhid
+	print, "Blackhole center (used as center): ", center
+endif
+
+
+orig_center= center
+
+
+
+; Do Stars
+;===========
+;do_stars_slit= 0
+do_stars_slit= 1
+if do_stars_slit eq 1 then begin
+	x= fload_allstars_xyz('x', center=[0,0,0])
+	y= fload_allstars_xyz('y', center=[0,0,0])
+	z= fload_allstars_xyz('z', center=[0,0,0])
+	vx= fload_allstars_v('x')
+	vy= fload_allstars_v('y')
+	vz= fload_allstars_v('z')
+	mass= fload_allstars_mass(1)
+endif
+
+
+; Do Gas
+;===========
+do_gas_slit= 0
+;do_gas_slit= 1
+if do_gas_slit eq 1 then begin
+        x= fload_gas_xyz('x', center=[0,0,0])
+        y= fload_gas_xyz('y', center=[0,0,0])
+        z= fload_gas_xyz('z', center=[0,0,0])
+        vx= fload_gas_v('x')
+        vy= fload_gas_v('y')
+        vz= fload_gas_v('z')
+        mass= fload_gas_mass(1)
+endif
+
+        
+
+;  middle - projected surface density + slit
+; ---------------------------------------------
+x_orig= x
+y_orig= y
+z_orig= z
+center= orig_center
+process_kin_image_and_overplot, x_orig, y_orig, z_orig, mass, xlen, x1, y0, x2, y1, $
+	rotate_phi=rotate_phi, rotate_theta=rotate_theta, $
+	center=center, /show_re, R_e=R_e, $ ;/showbhs, $
+	set_maxden=10.0, set_dynrng=1.0e5, $
+	fitstoo=fitstoo, filename=filename, $
+	;msg1='stars', msg2=' ', /drawbox, xslit=slit_len, yslit=0.5*slit_width, $
+	;msg1=' ', msg2=' ', /show_maj_slit, /show_min_slit, $
+	msg1=' ', msg2=' ', /show_maj_slit, $
+	xslit=slit_len, yslit=0.5*slit_width, $
+	;msg1=' ', msg2=' ', xslit=slit_len, yslit=0.5*slit_width, $
+	fit_a=fit_a, fit_b=fit_b, fit_ellip=fit_ellip, a4diva=a4diva, $
+	ReturnedMap=ReturnedMap, pa=pa, HalfMassSB=HalfMassSB
+
+
+
+if pa_fixed ne -1 then pa= pa_fixed
+
+
+;  left - velocity field within slit
+; ------------------------------------------
+x_orig= x
+y_orig= y
+z_orig= z
+vx_orig= vx
+vy_orig= vy
+vz_orig= vz
+center= orig_center
+process_kin_slit_and_overplot, x_orig, y_orig, z_orig, vx_orig, vy_orig, vz_orig, mass, $
+        x0, y0, x1, y1, $
+        center=center, /ditchsigma, $
+        rotate_phi=rotate_phi, rotate_theta=rotate_theta, $
+        slit_len=slit_len, slit_width=slit_width, $
+        slit_bins=slit_bins, slitmax=slitmax, vmax=vmax, $
+	Rin=0.5*R_e, Sig=Sig, $
+	Vrot_maj=Vrot_maj, avgVrot_maj=avgVrot_maj, $
+	Vrot_min=Vrot_min, avgVrot_min=avgVrot_min, $
+        pa=pa
+
+
+
+; labels, if we want 'em
+thetalbl= strcompress(string(rotate_theta),/remove_all)
+digs= 3
+if rotate_theta gt 100.0 then digs= 5
+if rotate_theta gt 10.0 then digs= 4
+thetalbl= '!7h!6='+strmid(thetalbl,0,digs)
+xyouts, x0+0.02, y1-0.08, thetalbl, /normal, size=1.4, color= 0, charthick= 3.0
+
+philbl= strcompress(string(rotate_phi),/remove_all)
+digs= 3
+if rotate_phi gt 100.0 then digs= 5
+if rotate_phi gt 10.0 then digs= 4
+philbl= '!7u!6='+strmid(philbl,0,digs)
+xyouts, x0+0.02, y1-0.14, philbl, /normal, size=1.4, color= 0, charthick= 3.0
+
+
+
+
+
+
+;  right - velocity field
+; ----------------------------
+x_orig= x
+y_orig= y
+z_orig= z
+vx_orig= vx
+vy_orig= vy
+vz_orig= vz
+center= orig_center
+process_kin_velimage_and_overplot, x_orig, y_orig, z_orig, vx_orig, vy_orig, vz_orig, mass, $
+	xlen, x2, y0, x3, y1, /velocitymap, $
+	rotate_phi=rotate_phi, rotate_theta=rotate_theta, $
+	center=center, $ ;/showbhs, $
+	set_maxden=10.0, set_dynrng=1.0e5, $
+	;pa=pa, /show_maj_slit, /show_min_slit, $
+	pa=pa, /show_maj_slit, $
+	xslit=slit_len, yslit=0.5*slit_width, $
+	fitstoo=fitstoo, filename=filename, $
+	msg1=' ', msg2=' ', $ ; /drawbox, xslit=slit_len, yslit=0.5*slit_width, $
+	ContourMap=ReturnedMap, HalfMassSB=HalfMassSB, /colorbar_onright
+
+
+
+
+
+
+
+
+; any extras?
+; -------------
+
+;xyouts, 0.02, 0.45, fload_timelbl(1,2,/noteq), /normal, size= 1.33, charthick=3.0, color= 0
+
+
+device, /close
+
+; -------------
+;  Done
+; -------------
+
+
+end
+
+
+
+; -----------------------------------------------------------------------------
+
+
+

@@ -1,0 +1,13 @@
+#!/usr/bin/csh
+
+
+gcc -shared -m32 -I/usr/lib/include -c -o main.o main.c
+g77 -shared -m32 -I/usr/lib/include -c -o emissivity_callable.o emissivity_callable.f
+gcc -shared -m32 -I/usr/lib/include main.o emissivity_callable.o -o raymond_smith -L/usr/lib -lm -lg2c
+
+
+echo "done"
+
+
+
+

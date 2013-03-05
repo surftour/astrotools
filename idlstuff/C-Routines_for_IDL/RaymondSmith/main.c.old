@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+extern void emissivity_(double*, double*, double*, double*, double*, double*, double*, double*);
+
+int   N;
+float redshift;
+float *zmet,*e_density,*mass,*T,*hsml;
+float *soft_lum,*hard_lum;
+
+int raymond_smith(int argc, void *argv[])
+{
+	int i;
+	double ebin 	= 0.0;
+	double etin 	= 0.0;
+	double zrin 	= 0.0;
+	double rmin 	= 0.0;
+	double tdegkin 	= 0.0;
+	double edin 	= 0.0;
+	double rnhin 	= 1.0;
+	double ans	= 0.0;
+	float  ans_float = 0.0;
+	double conversion = 9.0561e56;
+	double solar_lum = 3.9e33; 
+	float *ans_input;
+
+	N 		=*(int*)argv[0];
+	redshift	=*(float*)argv[1];
+	zmet 		=(float*)argv[2];
+	e_density	=(float*)argv[3];
+	mass		=(float*)argv[4];
+	T		=(float*)argv[5];
+	hsml		=(float*)argv[6];
+	soft_lum	=(float*)argv[7];
+	hard_lum	=(float*)argv[8];
+
+
+	zrin = redshift;
+	printf("calculating xray luminosities...\n");
+	fflush(stdout);
+	for(i=0;i<N;i++)
+	{
+		rmin 	= zmet[i];
+		tdegkin = T[i];
+		edin	= e_density[i];
+
+		if(tdegkin>1.0e5)
+		{
+			//soft band
+			ebin = 200.0;
+			etin = 1000.0;
+			emissivity_(&ebin,&etin,&zrin,&rmin,&tdegkin,&edin,&rnhin,&ans);
+			ans_float = ans*mass[i]*conversion/solar_lum;
+			ans_input = soft_lum+i;
+			*ans_input = ans_float;
+			if(!(i%1000))
+			{
+				printf("i=%d  m=%e T=%e ne=%e z=%f L=%e  ...\n",i,mass[i],tdegkin,edin,rmin,ans_float);
+				fflush(stdout);
+			}
+
+			//hard band
+			ebin = 2000.0;
+			etin = 10000.0;
+			emissivity_(&ebin,&etin,&zrin,&rmin,&tdegkin,&edin,&rnhin,&ans);
+			ans_float = ans*mass[i]*conversion/solar_lum;
+			ans_input = hard_lum+i;
+			*ans_input = ans_float;
+		}else{
+			ans_float = 0.0;
+			ans_input = soft_lum+i;
+			*ans_input = ans_float;
+			ans_float = 0.0;
+			ans_input = hard_lum+i;
+			*ans_input = ans_float;
+		}
+	}
+	printf("done!\n");
+
+	return 0;
+}

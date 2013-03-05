@@ -1,0 +1,29 @@
+#
+# Makefile to generate the NH values for particles given some (theta,phi)
+# Paul Martini
+# 24 March 2005
+#
+
+EXEC 	= getnh.so 
+SRCS	= idlmakedustmap.c allocate.c printhead.c system.c setup_units.c \
+	  localvalues.c cooling.c tree.c readsnap.c overhead.c 
+
+OBJS	= $(SRCS:.c=.o)
+INCL	= allvars.h   \
+	  nrutil.h
+
+CFLAGS	=  -shared -m32
+#CFLAGS	=  -xarch=v9
+
+LIBS   =
+CC     =  cc
+
+${EXEC} : $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBS)  -o $(EXEC)
+
+# $(OBJS): $(INCL)
+$(OBJS): $(SRCS)
+
+clean:
+	rm $(OBJS) $(EXEC)
+

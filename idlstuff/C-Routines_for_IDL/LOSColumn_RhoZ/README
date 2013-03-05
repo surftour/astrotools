@@ -1,0 +1,93 @@
+Notes for the column-density calculating code:
+
+-the makefile is set to compile the code. it includes:
+	TREECOOL
+	allocate.c
+	cooling.c
+	localvalues.c
+	main.c
+	overhead.h
+	printhead.c
+	proto.h
+	readsnap.c
+	setup_units.c
+	system.c
+	tree.c
+	
+	overhead.h controls most of the important options. near the top of the file, 
+		several global variables are set. most are explained in the comments. 
+		the most important, however:
+		
+		RAY_ORIGIN_TYPE - controls the type of particles from which to send rays
+			and calculate the column densities. will do so for every such particle
+			in the snapshot
+		
+		NUMBER_OF_RAYS - number of rays per origin -- essentially gives the 
+			resolution in solid angle. distributions tend to converge for >100 rays. 
+	
+		TREE_FRAC_HSML - resolution of the tree-cell grid, in units of the smoothing
+			length. Should be of order 1.
+			
+		
+		Note: the run time for the code scales proportionally to the number of rays
+		 (number of origin particles of a given type)*(number of rays per origin), 
+		 and proportional to the grid resolution (inversely proportional to 
+		 TREE_FRAC_HSML). For TREE_FRAC_HSML = 1.0, the code can process about
+		 1.0 - 1.5 million rays per minute (100 rays per source x 10000 sources or so)
+		 
+		 
+		also set here are the options controlling how the 'hot' and 'cold' phases
+		are calculated -- should be set to match the simulation values, ideally, but 
+		doesn't change the results massively if you just leave the defaults.
+		
+	
+	main.c 
+		it'll prompt you for the name of the snapshot and the name of the 
+		output file for the column density data. 
+		
+		de-comment lines 44-50 to have it also prompt for a filename and print 
+		a couple-line file with the snapshot header information, if you want.
+		
+		the outputs in the NH (binary) file are:
+		
+		ray origin type identifier (int)  -- standard GADGET numbers for particle types
+		number of ray origins (int)
+		number of rays per origin (int)
+		
+		then there's a list, the number of rays long, of theta & phi values (floats)
+		for the rays. i.e. if there are 1000 rays per origin, then there are 1000
+		theta and phi values, each pair evenly spaced in solid angle.
+		
+		then, for each ray origin, the binary output includes the following:
+		ray origin id (int) -- this is NOT the unique GADGET ID for the particle 
+			from which the ray originates. rather, if there are, say, 35,000 stars
+			as your ray origins, then this number runs from 0 to 34,999, the stars in the 
+			same order that the stars were listed in the original snapshot file. 
+			I think it's easier to deal with the particles in a given snapshot using
+			these indices. However, if you want to print the unique GADGET particle ID
+			for the origin particle here, all you have to do is un-comment lines 90-99.
+			
+			
+		then there are a list of column densities and corresponding metallicities (floats). 
+			there are as many of these as there are rays per source, and their order matches 
+			the order of the theta/phi values given above. the column density printed
+			is just the hot-phase column.
+			
+		that all gets listed for every ray, and then it's done. 
+			
+			
+NH_read.c is a quick routine that will read the binary output described above, 
+	it's standalone but should be easy enough to integrate with other C-code etc.
+	
+
+auto_scan_snaps.sh is just a quick shell script to loop over snapshots. set the
+	snapshot directory/prefix at the top, the desired header name for the column
+	density outputs (they'll all have that name followed by the 'xxx' snapshot number), 
+	and have j run over the snapshots you want.
+	
+	
+
+			
+			
+			
+		

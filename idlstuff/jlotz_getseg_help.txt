@@ -1,0 +1,104 @@
+From: Jennifer Lotz <lotz@noao.edu>
+Date: January 29, 2010 2:18:22 PM PST
+To: "Thomas J. Cox" <tcox@obs.carnegiescience.edu>
+Subject: Re: help??
+
+Hi TJ -
+
+Sorry it taken me a week to get back to you... I've been traveling.
+
+Here is my code for getting segmentation maps for our SUNRISE simulation images.    You'll probably want to hack it up a bit,
+since it is designed to locate just 1 or 2 objects,  and ignore everything else.
+
+to run on the idl command line,   type
+
+getseg, 'imgfile',  'noisefile',  'segfile',  positions,  boxsize,  thresh1,  thresh2
+
+where  'imgfile'  is the file name of your K-band galaxy image
+            'noisefile'  is the file name for the noise image ;   you can either cut out a piece of sky to characterize the noise or
+                                hack up the code to replace this with the value for the sigma in the background.
+
+             'segfile'  is the output segmentation map;  this will have integer pixel values equal 0 (no object), 1 (1st object),  2 (second object), etc.
+
+             positions is a 4 x 1 array  [xc1, yc1, xc2, yc2]   giving the central x,y positions of 2 objects;   if you just have one object, you can just
+                       give the same xc, yc for both object 1 and object 2  (or hack this part).
+
+             boxsize  is the smoothing length in pixels for the boxcar average smoothing;   I usually set this to a few times the PSF function
+
+              thresh1  is the initial threshold in  n-sigma  (where sigma is from the background) for the smoothed image, above which objects are
+                              first detected.   (I usually start with 15)
+
+              thresh2  is the secondary threshold in n-sigma  (should be lower than thresh1);   the objects detected about thresh1 are 'grown' out
+                                to thresh2 .    (I usually start with 2 )
+
+
+The output segmentation map is pretty sensitive to thresh1, thresh2, and the boxsize.
+
+Give it a try and feel free to hack it to pieces.     You'll have to play with it a bit to get the thresholding right.
+If this doesn't work for you,  there is alway SExtractor.
+
+good luck-
+Jen
+
+
+
+ 
+
+
+On Jan 20, 2010, at 5:42 PM, Thomas J. Cox wrote:
+
+Hey Jen,
+
+Thanks for the information, and I'm glad I picked a relatively good candidate for our initial test.  Or at least good in the sense that we can tie it to a lot of other things.
+
+Hmmmm, how to proceed????  Barry gave me both his K-band data and an ACS image.  So I'd guess that the SDSS maps won't apply here.  Is running the code and generating the map a straightforward procedure, or not?  I'd be glad to do it myself if you have a handy piece of information for potential users.  I've got something like this for people using all my Gadget/IDL junk, but it's still a bit of a learning curve.  As I presume your stuff is too.
+
+I'm flexible, and wouldn't mind generating the map myself, so if you think I can do it, just send me the code.  If I get bogged down, or start asking you more questions and taking up more time than just doing it yourself, then we can change course at that point.
+
+Many thanks,
+TJ
+
+
+On Jan 20, 2010, at 4:35 PM, Jennifer Lotz wrote:
+
+Hi TJ,
+
+Sounds like an interesting project.    Sure,  you can have my IDL code  or I can run this for you.    Actually,  my summer student  2 summers ago was looking at just this
+galaxy to try to quantify the shapes of the tails,  so I might even have some images + segmentation maps lying around.      I think my images are from SDSS.
+This was also one of the galaxies in our IFU pilot study (which I still haven't reduced yet !!)  -- as CoI  you are welcome to that data too.
+
+I'm a bit swamped at the  moment,  but I can probably get to this on Friday.    Let me know how you want to proceed.
+
+Cheers,
+Jen
+
+
+
+
+
+
+
+
+On Jan 20, 2010, at 4:54 PM, Thomas J. Cox wrote:
+
+Hello Jen,
+
+How are things with you?  Well, I hope.  Besides the rain, that is.  Although, now that I'm getting used to sun everyday, it's actually kind of nice to see some different weather.
+
+Anyway, I have a question/comment/something for you.  But first some background.  I've been thinking about generating tidal features in galaxy interactions.  To this end, Lars, Elena, and I have come up with a quick and easy way to understand the tidal impulse, and then put this into the models by hand.  This allows one to generate a tidal perturbation, and the induced tidal material, without having to run the entire merger simulations (i.e., it takes 3 minutes, rather than 3 days).  While this is still in its infancy, I think it will be a huge step forward to understanding tidal material and finding matching models to local interacting galaxies.
+
+So, long story short, I'm trying to test this out and I've started with NGC 2623, a local interacting galaxy with two nice tidal tails.  Barry Rothberg gave me an image to play around with and now I'd like to get some idea of how much mass is in the tidal tails as compared to the nuclear regions.  Eventually, color information, etc. will be useful to constrain the tidal material, but for the moment, I'm just trying to get a basic idea for what's going on.
+
+Sounds simple, huh?
+
+Well, this pesky background thing is cramping my style.  Obviously, the simulations are easier in this regard.  I'l like to think of an easy way to mask out just the tidal material, so that these pixels are separate from the sky.  Then I can sum, divide up, arrange, whatever, with this material as much as I want.  I presume that this is a pretty standard observing procedure, and I know that you do this for calculating your morphology measures, albeit what I'm wanting to do might be pushing the boundary between background and galaxy.
+
+So, the purpose of this email is as follows: Would you mind passing along your IDL code to create the segmentation maps?  I'd also gladly pass along the image and you could take a stab at it too.  In the end, what I'm looking for is a list of pixels or some demarked image that lets me separate out the galaxy from the non-galaxy.
+
+Any and all comments are welcome.
+
+Thanks a bunch,
+TJ
+
+
+

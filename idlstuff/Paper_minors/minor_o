@@ -1,0 +1,144 @@
+pro print_the_goods, junk
+
+
+if not keyword_set(junk) then begin
+   print, "  "
+   print, "print_the_goods, junk"
+   print, "  "
+   print, "  "
+   return
+endif
+
+
+
+initialize_plotinfo, 1
+
+
+
+; ----------
+;  Data
+; ----------
+
+; mass ratio
+vc3b_mr= [1.0, 1.0, 0.35, 0.125]
+vc3_mr= [1.0, 0.35, 0.125]
+vc2_mr= [1.0, 0.35]
+vc1_mr= [1.0]
+
+
+; gas consumption
+; ----------------
+; w/o
+vc3b_gc= [0.99, 0.92, 0.81, 0.69]
+vc3_gc= [0.94, 0.78, 0.71]
+;vc2_gc= [0.xx, 0.xx]
+vc1_gc= [0.99]
+
+; with BlackHole
+vc3b_gc= [0.68, 0.68, 0.67, 0.65]
+vc3_gc= [0.68, 0.68, 0.58]
+vc2_gc= [0.62, 0.64]
+vc1_gc= [0.66]
+
+
+
+
+; bh growth
+vc3b_bh= [0.006682, 0.004005, 0.000438, 0.000136]
+vc3_bh= [0.003943, 0.000768, 0.000382]
+vc2_bh= [0.001032, 0.00029]
+vc1_bh= [0.00026]
+
+
+; other ???
+vc3b_o= [0.0, 0.0, 0.0, 0.0]
+vc3_o= [0.0, 0.0, 0.0]
+vc2_o= [0.0, 0.0]
+vc1_o= [0.0]
+
+
+
+
+
+print_gas_consumption, vc3b_mr, vc3_mr, vc2_mr, vc1_mr, $
+			vc3b_gc, vc3_gc, vc2_gc, vc1_gc, $
+			frun=frun, msg=msg, filename='gc.eps'
+
+
+
+end
+
+
+
+
+;--------------------------------------
+;  Print the Shit
+;--------------------------------------
+
+
+
+
+pro print_gas_consumption, vc3b_mr, vc3_mr, vc2_mr, vc1_mr, $
+			vc3b_gc, vc3_gc, vc2_gc, vc1_gc, $
+                        frun=frun, msg=msg, filename=filename
+
+
+setup_plot_stuff, 'ps', filename=filename, colortable=4
+
+xaxistitle = "Mass Ratio (M!Dsat!N/M!Dprimary!N)"
+yaxistitle = "Gas Consumption"
+xmax = 1.05
+xmin = -0.05
+ymax = 1.2
+ymin = 0.0
+
+
+;---------------------------
+
+!p.position= [0.18, 0.15, 0.95, 0.95]
+
+plot, [1.0],[1.0], psym=-3, $
+        xrange=[xmin,xmax], yrange=[ymin,ymax], $
+        color= 0, $
+        ;/ylog, $
+        xstyle=1, ystyle=1, $
+        xcharsize=1.50, ycharsize=1.50, $
+        xthick=4.0, ythick=4.0, $
+        charthick=3.0, $
+	;ytickformat='exp_label', $
+	xtitle=xaxistitle, $
+	ytitle=yaxistitle, $
+	/nodata
+
+
+
+oplot, vc3b_mr, vc3b_gc, thick=3.0, psym=-2, color= 150
+oplot, vc3_mr, vc3_gc, thick=3.0, psym=-5, color= 120
+oplot, vc2_mr, vc2_gc, thick=3.0, psym=-6, color= 80
+oplot, vc1_mr, vc1_gc, thick=3.0, psym=-7, color= 50
+
+
+if keyword_set(msg) then begin
+   if msg NE '' then xyouts, 0.25, 0.80, bhmsg, /normal, charthick=3.0, size=1.33, color=0
+endif
+
+
+;--------------------------------------
+;--------------------------------------
+
+device, /close
+
+
+end
+
+
+
+
+
+
+;=====================================================
+
+
+
+
+

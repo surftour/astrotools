@@ -1,0 +1,681 @@
+pro time_centers, frun, $
+		startsnap=startsnap, $
+		endsnap=endsnap
+
+
+
+;------------------------------------
+;
+;  MAKE SURE TO
+;
+;  .run process_directory
+;
+;------------------------------------
+
+
+if not keyword_set(frun) then begin
+	print, " "
+	print, " time_centers, frun"
+	print, " "
+	print, " Get's centers from the black hole positions"
+	print, " but fair warning that it might be better to"
+	print, " change this to find centers based upon g1_sid,"
+	print, " g1_npart, g2_sid, g2_npart which would need to"
+	print, " be set internally."
+	print, " "
+	print, " "
+	return
+endif
+
+
+
+; this assumes they are ordered
+;  0 through
+
+
+; determine the number of
+; snapshots in frun directory
+;spawn, "ls "+frun+"/snapshot* | wc ",result
+;spawn, "/usr/bin/ls "+frun+"/snap* | wc ",result
+spawn, "/bin/ls "+frun+"/snapshot_* | wc ",result
+nsnaps=long(result[0])
+
+if not keyword_set(startsnap) then startsnap= 0
+if not keyword_set(endsnap) then endsnap= nsnaps
+
+
+time= fltarr(nsnaps)
+
+; hold density max center
+center_1_den=       fltarr(nsnaps,3)
+center_2_den=       fltarr(nsnaps,3)
+comvel_1_den=       fltarr(nsnaps,3)
+comvel_2_den=       fltarr(nsnaps,3)
+cenvel_1_den=       fltarr(nsnaps,3)
+cenvel_2_den=       fltarr(nsnaps,3)
+
+; holds bh centers
+center_1_bh=       fltarr(nsnaps,3)
+center_2_bh=       fltarr(nsnaps,3)
+comvel_1_bh=       fltarr(nsnaps,3)
+comvel_2_bh=       fltarr(nsnaps,3)
+cenvel_1_bh=       fltarr(nsnaps,3)
+cenvel_2_bh=       fltarr(nsnaps,3)
+
+
+; /raid4/tcox/localgroup/v1
+;g1_sid= 1L
+;g1_npart= 140000L
+;g2_sid= 140001L
+;g2_npart= 220000L
+; /raid4/tcox/localgroup/v2,3,4,5,6
+;g1_sid= 1L
+;g1_npart= 500001L
+;g2_sid= 500002L
+;g2_npart= 800001L
+;
+
+;; std vc3c mergers
+;g1_sid= 1L
+;g1_npart= 200001L
+;g2_sid= 200002L
+;g2_npart= 200001L
+; old vc3 20% gas with bulge
+;g1_sid= 1L
+;g1_npart= 210001L
+;g2_sid= 210002L
+;g2_npart= 210001L
+; old vc1
+;g1_sid= 1L
+;g1_npart= 70001L
+;g2_sid= 70002L
+;g2_npart= 70001L
+
+; stephanie's antennae mergers
+;g1_sid= 1L
+;g1_npart= 200000L
+;g2_sid= 200001L
+;g2_npart= 200000L
+
+; b5, d5, b2
+;g1_sid= 1L
+;g1_npart= 550001L
+;g2_sid= 550002L
+;g2_npart= 550001L
+
+; new(ish) 60% gas ones
+; /raid4/tcox/bs/
+;g1_sid= 1L
+;g1_npart= 550000L
+;g2_sid= 550001L
+;g2_npart= 550000L
+
+; gurtina's MW/LMC ic's
+;g1_sid= 1L
+;g1_npart= 148001L
+;g2_sid= 148002L
+;g2_npart= 300000L
+
+; G3G1
+;g1_sid= 1L
+;g1_npart= 240000L
+;g2_sid= 240001L
+;g2_npart= 95000L
+; G3G2
+;g1_sid= 1L
+;g1_npart= 240000L
+;g2_sid= 240001L
+;g2_npart= 150000L
+; G3Rd4eG1
+;g1_sid= 1L
+;g1_npart= 220000L
+;g2_sid= 220001L
+;g2_npart= 95000L
+
+
+; josh's z=5
+; fg=0.8
+;g1_sid= 1L
+;g1_npart= 1180000L
+;g2_sid= 1180001L
+;g2_npart= 590000L
+; fg=0.4
+;g1_sid= 1L
+;g1_npart= 1120000L
+;g2_sid= 1120001L
+;g2_npart= 560000L
+
+; josh's minors
+;g1_sid= 1L
+;g1_npart= 1600001L
+;g2_sid= 1600002L
+;g2_npart= 170001L
+
+
+; brant's z=6 "full_models"
+;g1_sid= 1L
+;g1_npart= 140000L
+;g2_sid= 140001L
+;g2_npart= 140000L
+
+
+; assume it's a major merger
+;ok= fload_snapshot_bh(frun,0,/header_only)
+;g1_sid= long(1)
+;g1_npart= long(total(fload_npart(99))/2.)
+;g2_sid= g1_npart+1
+;g2_npart= g1_npart
+;print, " "
+;print, " assuming it's a major merger "
+;print, " g1_sid, g1_npart= ", g1_sid, g1_npart
+;print, " g2_sid, g2_npart= ", g2_sid, g2_npart
+;print, " "
+
+
+; what happens if we don't assume it's a major
+; merger, but instead we check for BH's and do it from
+; there
+
+ok= fload_snapshot_bh(frun,0,/nopot_in_snap)
+init_bhids= fload_blackhole_id(1)
+init_bhids= long(init_bhids(sort(init_bhids)))
+n_bh= n_elements(init_bhids)
+print, "Blackhole ID's: ", init_bhids
+
+
+
+
+
+time= fltarr(nsnaps)
+
+; hold density max center
+center_den= fltarr(n_bh,nsnaps,3)
+comvel_den= fltarr(n_bh,nsnaps,3)
+cenvel_den= fltarr(n_bh,nsnaps,3)
+
+; holds bh centers
+center_bh= fltarr(n_bh,nsnaps,3)
+comvel_bh= fltarr(n_bh,nsnaps,3)
+cenvel_bh= fltarr(n_bh,nsnaps,3)
+
+
+
+
+; ----------------------------------------
+; This part loops through the snapshots
+; and compiles sigma and BH information
+; ----------------------------------------
+
+
+for i=startsnap,endsnap-1 do begin
+
+	print, "--------------------------------------"
+
+
+	; open snapshot
+	if i ne 0 then begin
+	  if i ge 1000 then begin
+		 ok=fload_snapshot_bh(frun,i,/nopot_in_snap,/do_four,/skip_center)
+	  endif else begin
+		 ok=fload_snapshot_bh(frun,i,/nopot_in_snap,/skip_center)
+	  endelse
+	endif
+
+	; what time is it?
+	time[i]= fload_time(1)
+
+
+	;
+	; ---------------------------------------------------
+	for bhi= 0, n_bh-1 do begin
+
+		if bhi eq 0 then sid= long(1) else sid= init_bhids[bhi-1]+1
+		if bhi eq 0 then npart= init_bhids[bhi] else npart= init_bhids[bhi]-init_bhids[bhi-1]
+
+		print, "========================================"
+		print, "bhi= ", bhi
+		print, "sid= ", sid
+		print, "npart= ", npart
+
+		; density method
+		center_den[bhi,i,*]= fload_1gal_center(sid,npart)
+		;center_1_den[i,*]= fload_1gal_baryonic_center(sid,npart)
+		;center_1_den[i,*]= fload_1gal_dm_center(sid,npart)
+
+
+		; center-of-mass velocity, and central density velocity
+		;   both of these need the particle numbers to be set
+		;   correctly.
+		comvel_den[bhi,i,*]= fload_1gal_comvel(sid,npart,center=center_den[bhi,i,*],rfact=1.0)
+		cenvel_den[bhi,i,*]= fload_comvel(1,center=center_den[bhi,i,*],rfact=0.001)
+
+
+
+		; now, use BH positions
+		bhidx= where(init_bhids[bhi] eq fload_blackhole_id(1))
+		;if fload_npart(5) ge 1 then begin
+		if bhidx(0) ne -1 then begin
+			;print, "in bh center routine"
+			;print, "fload_npart(5)= ", fload_npart(5)
+			;print, "idtofollow= ", init_bhids[bhi]
+			;print, "fload_blackhole_ids(1)= ", fload_blackhole_id(1)
+			center_bh[bhi,i,*]= fload_blackhole_xyz('xyz',center=[0,0,0],idtofollow=init_bhids[bhi])
+
+			; center-of-mass velocity, and central density velocity
+			;   both of these need the particle numbers to be set
+			;   correctly.
+			comvel_bh[bhi,i,*]= fload_1gal_comvel(sid,npart,center=center_bh[bhi,i,*],rfact=1.0)
+			cenvel_bh[bhi,i,*]= fload_comvel(1,center=center_bh[bhi,i,*],rfact=0.001)
+		endif
+	endfor
+
+endfor
+        
+
+
+;===============================================================================
+
+
+;stop
+
+; ----------------------------------------
+
+for bhi= 0, n_bh-1 do begin
+
+	bhlbl= strcompress(string(init_bhids[bhi]),/remove_all)
+
+	write_center, time, center_den[bhi,*,*], filename=frun+"/centers_den_"+bhlbl+".txt", bhid=init_bhids[bhi]
+	write_center, time, comvel_den[bhi,*,*], filename=frun+"/comvel_den_"+bhlbl+".txt", bhid=init_bhids[bhi]
+	write_center, time, cenvel_den[bhi,*,*], filename=frun+"/cenvel_den_"+bhlbl+".txt", bhid=init_bhids[bhi]
+
+        write_center, time, center_bh[bhi,*,*], filename=frun+"/centers_bh_"+bhlbl+".txt", bhid=init_bhids[bhi]
+        write_center, time, comvel_bh[bhi,*,*], filename=frun+"/comvel_bh_"+bhlbl+".txt", bhid=init_bhids[bhi]
+        write_center, time, cenvel_bh[bhi,*,*], filename=frun+"/cenvel_bh_"+bhlbl+".txt", bhid=init_bhids[bhi]
+endfor
+
+
+
+
+; ----------------------------------------
+
+print, "---------------------------------"
+print, "---------------------------------"
+print, "         DONE - enjoy            " 
+print, "---------------------------------"
+print, "---------------------------------"
+
+
+
+; ----------------------------------------
+
+
+;time_relative_diffs, frun
+
+
+; ----------------------------------------
+
+
+
+end
+
+
+
+
+;===============================================================================
+;
+;  not currently used
+;
+
+pro write_centerpositions, time, center_1, center_2, filename=filename
+
+
+
+openw, 1, filename
+
+; galaxy 1
+printf, 1, 'galaxy 1'
+
+lines= n_elements(time)
+printf, 1, lines
+
+data= fltarr(4,lines)
+data[0,*]= time
+c1= transpose(center_1)
+data[1:3,*]= c1
+printf, 1, data
+
+; galaxy 2
+printf, 1, 'galaxy 2'
+printf, 1, lines
+c2= transpose(center_2)
+data[1:3,*]= c2
+printf, 1, data
+
+
+close, 1
+
+
+end
+
+
+
+
+
+;===============================================================================
+
+
+
+pro write_center, time, center, filename=filename, bhid=bhid
+
+
+
+openw, 1, filename
+
+; galaxy 1
+printf, 1, bhid
+
+lines= n_elements(time)
+printf, 1, lines
+
+data= fltarr(4,lines)
+data[0,*]= time
+c1= transpose(center)
+data[1:3,*]= c1
+printf, 1, data
+
+close, 1 
+
+
+end
+
+
+
+
+
+
+
+
+;===============================================================================
+;
+;  not currently used
+;
+
+pro read_centerpositions, time, center_1, center_2, filename=filename
+        
+        
+        
+; read this with the following
+openr, 1, filename, ERROR=err
+junk= ''
+lines= 0
+
+if err NE 0 then begin
+	print, " "
+	print, " ERROR found when opening file. "
+	print, " file: ", filename
+	print, " err: ", err
+	print, " "
+	close, 1
+	return
+endif
+
+; galaxy 1
+readf, 1, junk
+readf, 1, lines
+data= fltarr(4,lines)
+readf, 1, data  
+time= data[0,*] 
+gal1_xyz= data[1:3,*]
+center_1= gal1_xyz
+                
+; galaxy 2
+readf, 1, junk
+readf, 1, lines
+data= fltarr(4,lines)
+readf, 1, data
+gal2_xyz= data[1:3,*]
+center_2= gal2_xyz
+           
+           
+close, 1   
+           
+
+end        
+
+
+
+
+
+
+;===============================================================================
+
+
+
+pro read_center, time, center, filename=filename
+        
+        
+cmd= "wc "+filename
+spawn, cmd, result
+wclines= long(result[0])
+        
+; read this with the following
+openr, 1, filename, ERROR=err
+junk= ''
+lines= 0
+
+if err NE 0 then begin
+        print, " "
+        print, " ERROR found when opening file. "
+        print, " file: ", filename
+        print, " err: ", err
+        print, " "
+        close, 1
+        return
+endif
+
+; galaxy 1
+;readf, 1, bhid
+readf, 1, junk
+readf, 1, lines
+if lines lt 0 then lines= wclines-2
+data= fltarr(4,lines)
+readf, 1, data  
+time= data[0,*]
+gal1_xyz= data[1:3,*]
+center= gal1_xyz
+                
+           
+close, 1   
+
+
+end        
+
+
+
+
+
+
+
+
+;===============================================================================
+
+
+
+pro find_rdiffs, frun, time=time
+
+        ; read centers
+        ; -------------
+        read_centerpositions, cp_time, cp_cen1, cp_cen2, filename=frun+"/centers.txt"
+
+        cp_time= transpose(cp_time)
+        center_1= transpose(cp_cen1)
+        center_2= transpose(cp_cen2)
+
+	x = center_1[*,0] - center_2[*,0]
+	y = center_1[*,1] - center_2[*,1]
+	z = center_1[*,2] - center_2[*,2]
+
+	rdiff = sqrt(x*x + y*y + z*z)
+
+	idx=where(rdiff lt 15.0)
+
+	if idx(0) ne -1 then begin
+	   for i=0, (n_elements(idx)-1) do begin
+		print, "snap= ", i, cp_time(idx(i)), rdiff(idx(i))
+		if rdiff(idx(i)) le 0.0 then begin
+		  print, "bh's have merged"
+		  break
+		endif
+	   endfor
+	endif
+
+
+end
+
+
+
+
+
+
+pro find_rdiff, fbase, bhlbl1, bhlbl2, rdiff=rdiff, time=time
+
+	;
+	; gal 1
+	;
+	read_center, time1, center1, filename=fbase+bhlbl1+".txt"
+
+	;
+	; gal 2
+	;
+	read_center, time2, center2, filename=fbase+bhlbl2+".txt"
+
+
+	time= transpose(time1)
+	center1= transpose(center1)
+	center2= transpose(center2)
+
+	x = center1[*,0] - center2[*,0]
+	y = center1[*,1] - center2[*,1]
+	z = center1[*,2] - center2[*,2]
+	rdiff= sqrt(x*x + y*y + z*z)
+
+	; check for zero values
+	checkit= total(center1*center1)
+	if checkit le 0 then rdiff= 0
+	checkit= total(center2*center2)
+	if checkit le 0 then rdiff= 0
+
+end
+
+
+
+
+
+;===============================================================================
+;
+;
+;
+
+pro time_relative_diffs, frun
+
+if not keyword_set(frun) then begin
+        print, " "
+        print, " time_relative_diffs, frun"
+        print, " "
+        print, "  * requires center files"
+        print, " "
+        return
+endif
+
+
+;
+; get bh ids
+;
+ok= fload_snapshot_bh(frun,0,/nopot_in_snap)
+init_bhids= fload_blackhole_id(1)
+init_bhids= long(init_bhids(sort(init_bhids)))
+n_bh= n_elements(init_bhids)
+print, "Blackhole ID's: ", init_bhids
+
+
+;
+; gal 1
+;
+bhlbl1= strcompress(string(init_bhids[0]),/remove_all)
+
+;
+; gal 2
+;
+if n_bh gt 1 then begin
+   bhlbl2= strcompress(string(init_bhids[1]),/remove_all)
+endif else begin
+	print, " "
+	print, "              *****  PROBLEM  ****** "
+	print, " "
+	print, "   there is only one BH in this run - stopping "
+	print, " "
+	print, " "
+	return
+endelse
+
+
+
+find_rdiff, frun+"/centers_den_", bhlbl1, bhlbl2, rdiff=rdiff_den, time=time
+find_rdiff, frun+"/centers_bh_", bhlbl1, bhlbl2, rdiff=rdiff_bh
+
+find_rdiff, frun+"/cenvel_den_", bhlbl1, bhlbl2, rdiff=veldiff_cenden
+find_rdiff, frun+"/cenvel_bh_", bhlbl1, bhlbl2, rdiff=veldiff_cenbh
+
+find_rdiff, frun+"/comvel_den_", bhlbl1, bhlbl2, rdiff=veldiff_comden
+find_rdiff, frun+"/comvel_bh_", bhlbl1, bhlbl2, rdiff=veldiff_combh
+
+
+
+;
+; write to file(s)
+;
+filename= frun+"/centers_den_reldiff.txt"
+openw, 1, filename
+printf, 1, frun
+printf, 1, n_elements(time)
+data= fltarr(4,n_elements(time))
+data[0,*]=time
+data[1,*]=rdiff_den
+data[2,*]=veldiff_cenden
+data[3,*]=veldiff_comden
+printf, 1, data
+close, 1
+
+filename= frun+"/centers_bh_reldiff.txt"
+openw, 1, filename
+printf, 1, frun
+printf, 1, n_elements(time)
+data= fltarr(4,n_elements(time))
+data[0,*]=time
+data[1,*]=rdiff_bh
+data[2,*]=veldiff_cenbh
+data[3,*]=veldiff_combh
+printf, 1, data
+close, 1
+
+
+
+end
+
+
+
+
+
+
+; ----------------------------------------
+
+
+
+
+
+
+
+
+
+
+

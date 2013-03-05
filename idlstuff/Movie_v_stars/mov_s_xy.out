@@ -1,0 +1,129 @@
+
+PicNr=     542
+
+frun = /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32/
+snap = snapshot
+opening:  /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32//snapshot_542
+checking: pos              2           3     4269913           4    12809739
+checking: vel              2           3     4269913           4    12809739
+checking: id              1     4269913           3     4269913
+checking: mass              1      994913           4      994913
+Nwithmasses=       994913
+checking: u              1      372924           4      372924
+checking: rho              1      372924           4      372924
+checking: nume              1      372924           4      372924
+checking: numh              1      372924           4      372924
+checking: hsml              1      372924           4      372924
+checking: sfr              1      372924           4      372924
+sfr=       5.22490
+checking: stellage              1      621987           4      621987
+checking: mets              1      994911           4      994911
+center=   -0.29575     0.66976     1.87124   n=  4269913.0
+center=   14.72102    17.61565     1.16955   ---- Felix method
+center=   14.72364    17.62021     1.16643   ---- baryons only
+Blackhole ID:      1937501
+Blackhole center:       14.7237      17.6201      1.16638
+fload_allstars_xyz using com=       14.7237      17.6201      1.16638
+fload_allstars_xyz using com=       14.7237      17.6201      1.16638
+fload_allstars_xyz using com=       14.7237      17.6201      1.16638
+N=      1896987
+N=1896987
+.....................................................................................................max=     0.0292969min=  2.92969e-06     0.118157
+
+PicNr=     543
+
+frun = /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32/
+snap = snapshot
+opening:  /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32//snapshot_543
+checking: pos              2           3     4270041           4    12810123
+checking: vel              2           3     4270041           4    12810123
+checking: id              1     4270041           3     4270041
+checking: mass              1      995041           4      995041
+Nwithmasses=       995041
+checking: u              1      372748           4      372748
+checking: rho              1      372748           4      372748
+checking: nume              1      372748           4      372748
+checking: numh              1      372748           4      372748
+checking: hsml              1      372748           4      372748
+checking: sfr              1      372748           4      372748
+sfr=       5.22003
+checking: stellage              1      622291           4      622291
+checking: mets              1      995039           4      995039
+center=   -0.33241     0.67797     1.79773   n=  4270041.0
+center=   14.60922    17.46681     1.17776   ---- Felix method
+center=   14.60860    17.45992     1.17942   ---- baryons only
+Blackhole ID:      1937501
+Blackhole center:       14.6087      17.4600      1.17943
+fload_allstars_xyz using com=       14.6087      17.4600      1.17943
+fload_allstars_xyz using com=       14.6087      17.4600      1.17943
+fload_allstars_xyz using com=       14.6087      17.4600      1.17943
+N=      1897291
+
+N=1897291
+.....................................................................................................max=     0.0292969min=  2.92969e-06     0.123242
+
+PicNr=     544
+
+frun = /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32/
+snap = snapshot
+opening:  /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32//snapshot_544
+checking: pos              2           3     4270206           4    12810618
+checking: vel              2           3     4270206           4    12810618
+checking: id              1     4270206           3     4270206
+checking: mass              1      995206           4      995206
+Nwithmasses=       995206
+checking: u              1      372607           4      372607
+checking: rho              1      372607           4      372607
+checking: nume              1      372607           4      372607
+checking: numh              1      372607           4      372607
+checking: hsml              1      372607           4      372607
+checking: sfr              1      372607           4      372607
+sfr=       5.20844
+checking: stellage              1      622597           4      622597
+checking: mets              1      995204           4      995204
+center=   -0.35265     0.70538     1.73738   n=  4270206.0
+center=   14.50450    17.34989     1.17172   ---- Felix method
+center=   14.50140    17.35644     1.17259   ---- baryons only
+Blackhole ID:      1937501
+Blackhole center:       14.5012      17.3564      1.17249
+fload_allstars_xyz using com=       14.5012      17.3564      1.17249
+fload_allstars_xyz using com=       14.5012      17.3564      1.17249
+fload_allstars_xyz using com=       14.5012      17.3564      1.17249
+N=      1897597
+
+N=1897597
+.....................................................................................................max=     0.0292969min=  2.92969e-06     0.130463
+
+PicNr=     545
+
+frun = /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32/
+snap = snapshot
+opening:  /n/home/tcox/data/kecktests/Sb2x1Sb2x1_e_32//snapshot_545
+checking: pos              2           3     4270403           4    12811209
+checking: vel              2           3     4270403           4    12811209
+checking: id              1     4270403           3     4270403
+checking: mass              1      995403           4      995403
+Nwithmasses=       995403
+checking: u              1      372470           4      372470
+checking: rho              1      372470           4      372470
+checking: nume              1      372470           4      372470
+checking: numh              1      372470           4      372470
+checking: hsml              1      372470           4      372470
+checking: sfr              1      372470           4      372470
+sfr=       5.19210
+checking: stellage              1      622931           4      622931
+checking: mets              1      995401           4      995401
+center=   -0.24673     0.86431     1.88563   n=  4270403.0
+center=   14.39723    17.19467     1.17600   ---- Felix method
+center=   14.40262    17.18928     1.17295   ---- baryons only
+Blackhole ID:      1937501
+Blackhole center:       14.4028      17.1893      1.17309
+fload_allstars_xyz using com=       14.4028      17.1893      1.17309
+fload_allstars_xyz using com=       14.4028      17.1893      1.17309
+fload_allstars_xyz using com=       14.4028      17.1893      1.17309
+N=      1897931
+
+N=1897931
+.....................................................................................................max=     0.0292969min=  2.92969e-06     0.121720
+
+done

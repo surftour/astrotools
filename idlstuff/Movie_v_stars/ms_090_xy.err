@@ -1,0 +1,28 @@
+IDL Version 7.0 (linux x86_64 m64). (c) 2007, ITT Visual Information Solutions
+Installation number: 219149-1.
+Licensed for use by: Licensed for Finkbeiner group
+
+% Compiled module: $MAIN$.
+mkdir: cannot create directory `/n/home/tcox/data/minor/Sbfg0.4Scfg0.4_090//movie_xy/': File exists
+% Compiled module: GET_TIME_LIST.
+% Compiled module: LOADCT.
+% Compiled module: FILEPATH.
+% Compiled module: PATH_SEP.
+% LOADCT: Loading table BLUE/GREEN/RED/YELLOW
+% Compiled module: INTERPOLATE_STARS_DATA.
+% Compiled module: LOAD_STARS_DATA.
+% Compiled module: FLOAD_SNAPSHOT_BH.
+% Compiled module: FLOAD_CENTER.
+% Compiled module: FLOAD_CENTER_FELIX.
+% Compiled module: FLOAD_CENTER_BARYONS.
+% Compiled module: FLOAD_TIME.
+% Compiled module: FLOAD_BLACKHOLE_ID.
+% Compiled module: FLOAD_BLACKHOLE_XYZ.
+% Compiled module: FLOAD_NPART.
+% Compiled module: FLOAD_ALLSTARS_XYZ.
+% Compiled module: FLOAD_ALLSTARS_V.
+% Compiled module: FLOAD_ALLSTARS_IDS.
+% Compiled module: FLOAD_ALLSTARS_MASS.
+% Compiled module: FLOAD_GAS_MASS.
+% Compiled module: FLOAD_GAS_ID.
+% Loaded DLM: JPEG.

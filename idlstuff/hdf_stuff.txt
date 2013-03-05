@@ -1,0 +1,195 @@
+
+
+f="data1/tst/tst3_hdf/snapshot_000.hdf5"
+
+both crash
+------------
+fid=h5f_open(f)
+d=h5_browser(f)
+
+
+h5f_create
+h5t_IDL_create
+h5s_create_simple
+h5d_create
+h5d_write
+h5f_close
+
+h5f_open
+h5d_open
+h5t_idl_create
+h5d_read - read the image data
+h5f_close
+
+
+older ones (see fanning's table)?
+hdf_sd_end, endaccess, select, start
+
+
+
+
+------------------------------------------
+
+
+
+öOpen the file and assign it a file ID
+
+    fileID = HDF_SD_Start('filename', /read)
+
+If you have assigned the actual filename to a variable (file = 'my_file.hdf'),
+you do not need the quotes. When you are completely through with the file you
+should close it using the HDF_SD_End, filename command.
+
+2. Find the number of file attributes and datasets
+
+    HDF_SD_FileInfo, FileID, num_datasets, num_attributes
+
+3. Read the file attributes
+
+    HDF_SD_AttrInfo, FileID, attribute_index, name = attr_name, data =
+attr_data
+
+4. Select a dataset and assign it a dataset ID
+
+If you already know the name of the dataset, then you may use
+
+    dataset_index = HDF_SD_NameToIndex(fileID, dataset_name)
+
+Then you use this index to assign a dataset ID:
+
+    datasetID = HDF_SD_Select(fileID, dataset_index)
+
+if you don't yet know the exact name of the dataset, you'll have to explore
+them one by one (steps 5 and 6). The datasets are zero indexed; for example,
+EOS data starts with the geolocation data so that longitude is index = 0,
+latitude is index = 1, etc.
+
+5. Find the number of dataset attributes
+
+    HDF_SD_GetInfo, datasetID,name = dataset_name, natts = num_attributes, $
+               ndim=num_dims, dims =dimvector
+
+In which either the variables assigned with the equals signs are optional
+
+6. Read the dataset attributes
+
+    HDF_SD_AttrInfo, datasetID, attribute_index, name = attr_name, data =
+attr_data
+
+Note that this is the same syntax used to read the global file information.
+You will want to get the scale factor and offset from the attribute data to
+convert from the integerized data to the true data (see below).
+
+7. Import the selected dataset
+
+    HDF_SD_GetData, datasetID, data_variable, $
+                Start = [x, y, z], Count=[xdim,ydim,zdim],
+Stride=[xjump,yjump,zjump]
+
+Where the Start, Count, and Stride variables are optional.
+
+If the data is in integerized form, you will need to convert it to the true
+values:
+
+    true_data = scale*(filedata - offset)
+
+Now you're done! 
+
+
+
+
+
+================================================
+
+
+pro ex_read_hdf5 
+ 
+   ; Open the HDF5 file. 
+   file_id = H5F_OPEN('hdf5_test.h5') 
+ 
+   ; Open the image dataset within the file. 
+   ; This is located within the /images group. 
+   ; We could also have used H5G_OPEN to open up the group first. 
+   dataset_id1 = H5D_OPEN(file_id, '/images/Eskimo') 
+    
+   ; Read in the actual image data. 
+   image = H5D_READ(dataset_id1) 
+    
+   ; Open up the dataspace associated with the Eskimo image. 
+   dataspace_id = H5D_GET_SPACE(dataset_id1) 
+    
+   ; Retrieve the list of dimensions, so we can set the 
+   ;window size. 
+   dimensions = H5S_GET_SIMPLE_EXTENT_DIMS(dataspace_id) 
+ 
+   ; Now open and read the color palette associated with 
+   ; this image. 
+   dataset_id2 = H5D_OPEN(file_id, '/images/Eskimo_palette') 
+   palette = H5D_READ(dataset_id2) 
+ 
+   ; Close all our identifiers so we don't leak resources. 
+   H5S_CLOSE, dataspace_id 
+   H5D_CLOSE, dataset_id1 
+   H5D_CLOSE, dataset_id2 
+   H5F_CLOSE, file_id 
+ 
+   ; Display the data. 
+   DEVICE, DECOMPOSED=0 
+   WINDOW, XSIZE=dimensions[0], YSIZE=dimensions[1] 
+   TVLCT, palette[0,*], palette[1,*], palette[2,*] 
+    
+   ; We need to use /ORDER since the image is stored 
+   ; top-to-bottom. 
+   TV, image, /ORDER 
+ 
+end 
+
+
+
+================================================
+
+
+
+IDL> 
+IDL> findpro, "h5f_is_hdf5"
+% Compiled module: FINDPRO.
+% Compiled module: PATH_SEP.
+% FINDPRO: Procedure h5f_is_hdf5 is an intrinsic IDL procedure.
+% FINDPRO: No path information available.
+IDL> getpro, "h5f_is_hdf5"
+% Compiled module: GETPRO.
+% Compiled module: ZPARCHECK.
+% Compiled module: FILE_WHICH.
+% GETPRO: H5F_IS_HDF5 is an intrinsic IDL function
+% GETPRO: No source code is available
+IDL> help, !path
+<Expression>    STRING    =
+'/n/app/idl/idl70/lib:/n/home/tcox/idlstuff:/n/home/tcox/idlstuff/agn_spectrum:/n/home/tcox/idlstuff/attenuation:/n/home/tcox/idlstuff/image:/n/home/tcox/idlstuff/load:/'...
+IDL> help, /rou
+Compiled Procedures:
+$MAIN$                   
+FINDPRO                  proc_name DIRLIST NOPRINT PROLIST 
+FITS_HELP                file_or_fcb 
+FITS_OPEN                filename fcb APPEND HPRINT MESSAGE NO_ABORT UPDATE
+WRITE 
+GETPRO                   proc_name 
+ZPARCHECK                progname parameter parnum types dimens message 
+
+Compiled Functions:
+FILE_WHICH               path file INCLUDE_CURRENT_DIR 
+PATH_SEP                 PARENT_DIRECTORY SEARCH_PATH 
+IDL> 
+IDL> 
+IDL> 
+IDL> Result = H5_GET_LIBVERSION( )
+IDL> print, Result
+1.6.3
+IDL> , printH5_GET_LIBVERSION( )
+
+, printH5_GET_LIBVERSION( )
+ ^
+% Syntax error.
+IDL> print, H5_GET_LIBVERSION( )
+1.6.3
+IDL> 
+IDL> 

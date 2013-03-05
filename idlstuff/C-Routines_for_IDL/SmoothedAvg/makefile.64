@@ -1,0 +1,40 @@
+
+EXEC   = smoothedavg.so
+
+SRCS   = main.c ngbtree2d.c  \
+	 nrutil.c selectb.c sort_flt.c sort2_flt.c 
+
+
+OBJS   = $(SRCS:.c=.o)
+INCL   = allvars.h   \
+	 nrutil.h
+
+
+CFLAGS =  -m64
+
+LIBS   =   
+
+CC     =  gcc-3.4.2
+
+
+$(EXEC): $(OBJS) 
+#	ld -shared $(OBJS) $(LIBS)  -o $(EXEC)
+	ld -G $(OBJS) $(LIBS)  -o $(EXEC)
+
+
+$(OBJS): $(INCL) 
+
+
+
+clean:
+	rm $(OBJS) $(EXEC)
+
+
+
+
+
+
+
+
+
+

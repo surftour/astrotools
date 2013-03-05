@@ -1,0 +1,63 @@
+function fload_disk_energy, dummy, comv=comv, total=total, $
+                                        kinetic=kinetic, $
+                                        potential=potential, $
+					specific=specific
+
+
+    COMMON GalaxyHeader
+    COMMON OtherData
+    COMMON DiskData
+    COMMON BulgeData
+    COMMON PotData
+
+    if keyword_set(comv) then begin
+        c=comv
+    endif else begin
+        c=[0,0,0]
+    endelse 
+
+    if npart(2)+npart(3) le 0 then begin
+        print, " "
+        print, " no old star particles"
+        print, " "
+        return, [0]
+    endif
+
+
+        ; is there stuff
+        ; -------------------------
+        if npart(2) gt 0 then begin
+           allmasses = [mdisk]
+           allvxs = [vxdisk]
+           allvys = [vydisk]
+           allvzs = [vzdisk]
+           allps = [pdisk]
+        endif else begin
+	   return, [0]
+	endelse
+
+
+
+    v2= (allvxs-c(0))*(allvxs-c(0)) + (allvys-c(1))*(allvys-c(1)) + (allvzs-c(2))*(allvzs-c(2))
+
+    kinetic_energy= 0.5*allmasses*v2
+
+    if keyword_set(specific) then kinetic_energy= kinetic_energy / allmasses
+    if keyword_set(kinetic) then return, kinetic_energy
+
+    potential_energy= 0.5*allps*allmasses
+
+    if keyword_set(specific) then potential_energy= potential_energy / allmasses
+    if keyword_set(potential) then return, potential_energy
+
+
+    total_energy= potential_energy+kinetic_energy
+
+    return, total_energy
+
+end
+
+
+
+
+

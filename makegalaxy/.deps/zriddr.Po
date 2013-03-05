@@ -1,0 +1,11 @@
+zriddr.o zriddr.o: nrsrc/zriddr.c /usr/include/math.h \
+  /usr/include/architecture/i386/math.h /usr/include/sys/cdefs.h \
+  nrsrc/nrutil.h
+
+/usr/include/math.h:
+
+/usr/include/architecture/i386/math.h:
+
+/usr/include/sys/cdefs.h:
+
+nrsrc/nrutil.h:

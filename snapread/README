@@ -1,0 +1,21 @@
+
+Simple C program to read Gadget snapshots and output basic information.
+
+Usage:
+
+readsnap <filename> <[option]>
+
+options
+-------
+ -info   prints byte information for all fields present
+ -h      only the header information is printed to the screen
+ -m      prints the mass of a particle when displaying other information
+ -id     prints the ID for each particle.
+ -pot    prints the Potential for every particle.
+ -tm     prints the total mass of each type
+ -gm     prints the gas mass
+
+
+If no options are set, it will print basic snap information to a file, ic.txt.
+
+

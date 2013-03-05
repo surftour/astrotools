@@ -1,0 +1,28 @@
+#!/bin/sh
+#BSUB -q nancy
+#BSUB -J testkin
+#BSUB -n 1
+#BSUB -u tcox@cfa.harvard.edu
+#BSUB -o testkin.out
+#BSUB -e testkin.err
+#BSUB -R "span[ptile=1]"
+#BSUB -N
+
+
+
+# idl <<EOF
+# idl -32 <<EOF
+
+idl <<EOF
+
+.run tj_test.pro
+
+kinemetry_example
+
+EOF
+
+echo "done"
+
+
+
+

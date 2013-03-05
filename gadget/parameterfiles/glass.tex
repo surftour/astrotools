@@ -1,0 +1,146 @@
+%  Relevant files
+
+InitCondFile    /gmpa/mpa/vrs/glass/seed_glass.dat
+OutputDir       /gmpa/mpa/vrs/glass/
+
+EnergyFile        energy.txt
+InfoFile          info.txt
+TimingsFile       timings.txt
+CpuFile           cpu.txt
+
+RestartFile       restart
+SnapshotFileBase  glass
+
+
+% CPU-time limit
+
+TimeLimitCPU      21000.0  % was 23000
+ResubmitOn        0
+ResubmitCommand   restart.sh
+
+
+% Code options
+
+ICFormat              1
+SnapFormat            1 
+
+ComovingIntegrationOn 1
+
+NumFilesPerSnapshot       1
+NumFilesWrittenInParallel 1
+
+CoolingOn 0
+StarformationOn 0
+
+%  Caracteristics of run
+
+TimeBegin           0.00781250
+TimeMax	            1.0
+
+MaxSizeTimestep        0.01
+MinSizeTimestep        0.01
+
+TimeBetSnapshot        1.8340081
+TimeOfFirstSnapshot    0.00781250
+
+
+Omega0	              1.0
+OmegaLambda           0.0
+OmegaBaryon           0.0
+HubbleParam           0.5
+
+BoxSize                100000.0
+PeriodicBoundariesOn   1
+
+
+% Output frequency
+
+OutputListFilename  parameterfiles/OutputList.txt
+OutputListOn        0
+
+
+ 
+CpuTimeBetRestartFile  7200.0
+
+TimeBetStatistics      0.1
+
+
+% Accuracy of time integration
+
+TypeOfTimestepCriterion 0
+ErrTolIntAccuracy       0.0125 
+
+MaxRMSDisplacementFac   0.5    
+
+
+
+% Tree algorithm and force accuracy
+
+ErrTolTheta            0.5
+TypeOfOpeningCriterion 1
+ErrTolForceAcc         0.0025
+
+
+
+TreeDomainUpdateFrequency    0.25
+
+
+%  Parameters of SPH
+
+DesNumNgb           64
+MaxNumNgbDeviation  1
+
+ArtBulkViscConst    1.0
+InitGasTemp         1000.0  % initial gas temperature in K, only used if not given in IC file
+MinGasTemp          20.0    
+CourantFac          0.15
+
+
+% Further code parameters
+
+PartAllocFactor       1.5
+
+TreeAllocFactor       0.75
+
+BufferSize            30
+
+
+
+
+% System of units
+
+UnitLength_in_cm         3.085678e21        ;  1.0 kpc
+UnitMass_in_g            1.989e43           ;  1.0e10 solar masses
+UnitVelocity_in_cm_per_s 1e5                ;  1 km/sec
+GravityConstantInternal  0
+
+
+% Softening lengths
+
+MinGasHsmlFractional     0.1  % minimum gas smoothing in terms of the gravitational softening length
+
+SofteningGas        0.0
+SofteningHalo       20.0
+SofteningDisk       0.0
+SofteningBulge      0.0           
+SofteningStars      0.0
+SofteningBndry      0.0
+
+SofteningGasMaxPhys       0.0
+SofteningHaloMaxPhys      20.0
+SofteningDiskMaxPhys      0.0
+SofteningBulgeMaxPhys     0.0
+SofteningStarsMaxPhys     0.0
+SofteningBndryMaxPhys     0.0
+
+
+
+
+
+
+
+
+
+
+
+
