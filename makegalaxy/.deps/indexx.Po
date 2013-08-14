@@ -1,3 +1,0 @@
-indexx.o indexx.o: nrsrc/indexx.c nrsrc/nrutil.h
-
-nrsrc/nrutil.h:

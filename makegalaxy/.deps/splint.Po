@@ -1,1 +1,0 @@
-splint.o splint.o: nrsrc/splint.c

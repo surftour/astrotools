@@ -1,1 +1,0 @@
-gammp.o gammp.o: nrsrc/gammp.c

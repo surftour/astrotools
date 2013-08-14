@@ -1,5 +1,0 @@
-globvars.o: globvars.c globvars.h config.h
-
-globvars.h:
-
-config.h:

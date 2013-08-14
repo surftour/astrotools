@@ -1,3 +1,0 @@
-spline.o spline.o: nrsrc/spline.c nrsrc/nrutil.h
-
-nrsrc/nrutil.h:
