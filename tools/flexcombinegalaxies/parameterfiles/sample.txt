@@ -1,0 +1,57 @@
+
+gal_output              ./samplesquared.hdf5
+
+
+gal_fname1              ../makegalaxy/sample.hdf5
+theta1			90.0
+phi1			120.0
+
+
+gal_fname2              ../makegalaxy/sample.hdf5
+theta2			30.0
+phi2    	        60.0
+
+
+
+%
+% Method to combine galaxies:
+%
+%      kepler = standard keplerian orbit
+%
+%      manual = manually set the positon and velocity
+%
+ 
+combinetype		kepler
+
+
+
+%
+% kepler orbits
+%
+
+rperi                  4.0
+rstart                 160.0
+ecc                    1.0       % 1.0 = parabolic
+
+
+%
+% manual (note: will automatically be moved to set c.o.m.=[0,0,0])
+%
+
+g1_x_start			0.0
+g1_y_start			0.0
+g1_z_start			0.0
+g1_vx_start                     0.0
+g1_vy_start                     0.0
+g1_vz_start                     0.0
+
+g2_x_start			0.0
+g2_y_start			0.0
+g2_z_start			0.0
+g2_vx_start                     0.0
+g2_vy_start                     0.0
+g2_vz_start                     0.0
+
+
+
+
